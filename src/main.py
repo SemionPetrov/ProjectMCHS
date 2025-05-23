@@ -1,31 +1,50 @@
-from http.client import HTTPException
-from typing import Union, Dict
-
+import mysql.connector
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 
+class Settings(BaseSettings):
+    DB_HOST: str = "mydb"
+    DB_USER: str = "root"
+    DB_PASSWORD: str = "root"
 
-description = """
-API для системы документооборота МЧС
-"""
+settings = Settings()
 
-tags_metadata = [
-    {
-        "name": "тест",
-        "description": "ничего не делают",
+app = FastAPI()
+db = None
 
-    },
-]
+@app.on_event("startup")
+async def startup_event():
+    global db
+    db = mysql.connector.connect(
+        host=settings.DB_HOST,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        port=3306
+    )
 
-
-app = FastAPI(
-    title="ProjectMCHS",
-    description=description,
-    summary="API",
-    version="0.0.1",
-    openapi_tags=tags_metadata
-)
-
+@app.on_event("shutdown")
+async def shutdown_event():
+    global db
+    if db:
+        db.close()
 @app.get("/", tags=["test"])
-def get_all_terms():
-    return "hello world!" 
+def get_root():
+    return "Hello World!"
+
+@app.get("/dbtest")
+def test_database_connection():
+    return {"status": "connected", "connection_id": id(db)}
+
+@app.post("/dbtest")
+def execute_query(query: str):
+    try:
+
+        cursor = db.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return {
+            "status": "success",
+            "results": result
+        }
+    except Exception as e:
+        return e
