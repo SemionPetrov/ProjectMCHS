@@ -10,6 +10,7 @@ services:
     env_file:
       - ./mysql/local.env
     tty: true
+
   api:
     depends_on:
       - mysql
