@@ -3,9 +3,10 @@ from fastapi import FastAPI
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DB_HOST: str = "mydb"
+    DB_HOST: str = "mysql"
     DB_USER: str = "root"
-    DB_PASSWORD: str = "root"
+    DB_PASSWORD: str = "pwd123admin"
+    DB_PORT: int = 3306
 
 settings = Settings()
 
@@ -19,7 +20,7 @@ async def startup_event():
         host=settings.DB_HOST,
         user=settings.DB_USER,
         password=settings.DB_PASSWORD,
-        port=3306
+        port=settings.DB_PORT
     )
 
 @app.on_event("shutdown")
@@ -27,13 +28,17 @@ async def shutdown_event():
     global db
     if db:
         db.close()
+
+
 @app.get("/", tags=["test"])
 def get_root():
     return "Hello World!"
 
+
 @app.get("/dbtest")
 def test_database_connection():
     return {"status": "connected", "connection_id": id(db)}
+
 
 @app.post("/dbtest")
 def execute_query(query: str):
