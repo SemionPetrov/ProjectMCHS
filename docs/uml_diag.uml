@@ -1,0 +1,71 @@
+@startuml
+skinparam actorStyle awesome
+left to right direction
+
+actor Пользователь as User
+
+package Авторизация {
+    usecase "УЧ запись пользователя" as unpriv_user
+}
+
+package "Кадровая работа" {
+    package "Атестация" as certification {
+        usecase "Планирование атестаций" as planning_sessions
+        usecase "Добавление данных об атестации" as report_management
+    }
+    
+    package "Управление занятиями" as exercise{
+        usecase "Планирование занятий"
+        usecase "Составление отчетности по занятиям"
+    }
+    
+    package "Учёт личного Состава" as employee_management {
+        usecase "Управление общими данными сотрудников" as employee_data_management
+    }
+}
+
+package "Личный кабинет" as profile{
+    usecase "Изменение собственных данных"
+    usecase "Просмотр аттестаций"
+    usecase "Просмотр запланированных событий"
+    usecase "Просмотр привилегий"
+}
+
+package Администрирование {
+    usecase "Управление привилегиями" as access_control
+    usecase "Управление базой данных" as db_control
+    usecase "Доступ к технической информации" as backend_info
+}
+
+package "Проверка привилегий" as priv_check {
+    usecase "Привилегия управления данными сотрудников" as employee_management_priv
+    usecase "Привилегия управления аттестациями" as certification_management_priv
+    usecase "Привилегия управления занятиями" as planning_sessions_priv
+    
+    usecase "Привилегия управления доступом" as access_control_priv
+    usecase "Привилегия управления базой данных" as db_control_priv
+    usecase "Привилегия доступа к технической информации" as backend_info_priv
+}
+
+
+User --> unpriv_user
+unpriv_user --> priv_check
+unpriv_user -> profile
+
+priv_check -->  employee_management_priv
+priv_check -->  certification_management_priv
+priv_check -->  planning_sessions_priv
+
+priv_check -->  access_control_priv
+priv_check -->  db_control_priv
+priv_check -->  backend_info_priv
+
+employee_management_priv --> employee_management
+certification_management_priv --> certification
+planning_sessions_priv --> exercise
+
+access_control_priv --> access_control
+db_control_priv --> db_control
+backend_info_priv --> backend_info
+
+@enduml

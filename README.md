@@ -1,6 +1,8 @@
 # ProjectMCHS
 
-[Доки](https://drive.google.com/drive/folders/1O8I7lcUWHXA4Z6xpvW2Tnp-mM9MzI16N)
+![uml](./imgs/uml_diag_dark.png)
+
+[google диск с тз](https://drive.google.com/drive/folders/1O8I7lcUWHXA4Z6xpvW2Tnp-mM9MzI16N)
 
 ## Запуск
 
