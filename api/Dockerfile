@@ -8,5 +8,5 @@ RUN apt-get -q update && apt-get -qy install netcat-traditional
 
 EXPOSE 8000
 
-CMD ["./wait-for", "mysql:3306", "--", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./wait-for", "-t", "30", "mysql:3306", "--", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
 

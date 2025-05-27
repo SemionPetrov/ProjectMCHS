@@ -1,4 +1,4 @@
-FROM mysql:9.3.0
+FROM mysql:8.0.42 
 
 EXPOSE 3306
 
