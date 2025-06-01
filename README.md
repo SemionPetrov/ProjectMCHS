@@ -6,8 +6,20 @@
 
 ## Запуск
 
-Запуск только через докер.
-В ./mysql/db/ нужно класть sql для создания бд.
+Установка
+
+1. Клонировать репозиторий:
+
+```shell
+git clone https://ваш-url-репозитория.git
+```
+
+2. Перейти в директорию проекта:
+
+```shell
+cd projectmchs
+```
+3. Запустить контейнеры:
 
 ```shell
 docker compose up --build
@@ -23,9 +35,30 @@ docker compose up --build
 ## Работа с БД
 
 Теперь таблицы создаются из файла *./api/models.py*.
-При изменении таблицы не обновляются автоматический.
+Алгоритм изменения БД:
 
-Если срочно надо изменить базу то можно через mysql-workbench.
+1. Вносим изменения в *./api/models.py*
+Примеров достаточно, если че гуглится по sqlalchemy models.
+
+2. Найти *CONTAINER ID* контейнера *projectmchs-api* из:
+
+```shell
+docker ps
+```
+
+3. Сгенерировать новую миграцию:
+
+```shel
+docker exec -it  <id контейнера> alembic revision --autogenerate -m "<что изменили>"
+```
+
+4. Применить миграцию:
+
+```shel
+docker exec -it  <id контейнера> alembic upgrade head"
+```
+
+5. Можно проверить в mysql-workbench
 
 ## Credits
 

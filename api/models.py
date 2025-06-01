@@ -24,10 +24,12 @@ class Employee(Base):
     __tablename__ = "employee"
     
     id = Column(Integer, primary_key=True)
+
     last_name = Column(String(50), nullable=False)
     first_name = Column(String(50), nullable=False)
-    middle_name = Column(String(50))
-    birthday = Column(Date, nullable=False)
+    surname = Column(String(50), nullable=True)
+
+    birthday = Column(Date, nullable=True)
     position_id = Column(Integer, ForeignKey('dolzhnost.id'))
     rank_id = Column(Integer, ForeignKey('rang.id'))
     
@@ -39,11 +41,12 @@ class Employee(Base):
     attestations = relationship("Attestation", back_populates="employee")
     exercises = relationship("Exercise", back_populates="employee")
     exercises_reports = relationship("ExercisesReport", back_populates="employee")
+    1
 
 # Define the Dolzhnost model
 class Dolzhnost(Base):
     __tablename__ = "dolzhnost"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     group_position = Column(Enum('среднего и старшего начальствующего состава',
@@ -153,3 +156,15 @@ class AuthenticationToken(Base):
     
     # Relationship
     user = relationship("UserAuthentication", back_populates="authentication_tokens")
+    
+# Define the User model
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    employee_id = Column(Integer, ForeignKey('employee.id'), nullable=True)
+    login = Column(String(50), nullable=True)
+    password_hash = Column(String(50), nullable=True)
+    password_expiration = Column(DateTime, nullable=True)
+    token = Column(String(50), nullable=True)
+    employee = relationship("Employee")
