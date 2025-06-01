@@ -20,6 +20,13 @@ docker compose up --build
 
 При изменении файлов руками перезапускать ничего не надо.
 
+## Работа с БД
+
+Теперь таблицы создаются из файла *./api/models.py*.
+При изменении таблицы не обновляются автоматический.
+
+Если срочно надо изменить базу то можно через mysql-workbench.
+
 ## Credits
 
 [wait-for](https://github.com/eficode/wait-for?tab=readme-ov-file)

@@ -3,9 +3,11 @@ skinparam actorStyle awesome
 left to right direction
 
 actor Пользователь as User
+actor Администратор as Admin
 
 package Авторизация {
     usecase "УЧ запись пользователя" as unpriv_user
+    usecase "УЧ запись администратора" as admin_user
 }
 
 package "Кадровая работа" {
@@ -31,7 +33,7 @@ package "Личный кабинет" as profile{
     usecase "Просмотр привилегий"
 }
 
-package Администрирование {
+package Администрирование as administartion{
     usecase "Управление привилегиями" as access_control
     usecase "Управление базой данных" as db_control
     usecase "Доступ к технической информации" as backend_info
@@ -49,6 +51,10 @@ package "Проверка привилегий" as priv_check {
 
 
 User --> unpriv_user
+Admin --> admin_user
+
+admin_user --> administartion
+
 unpriv_user --> priv_check
 unpriv_user -> profile
 
@@ -69,3 +75,4 @@ db_control_priv --> db_control
 backend_info_priv --> backend_info
 
 @enduml
+
