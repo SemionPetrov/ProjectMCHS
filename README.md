@@ -11,7 +11,7 @@
 1. Клонировать репозиторий:
 
 ```shell
-git clone https://ваш-url-репозитория.git
+git clone https://github.com/SemionPetrov/ProjectMCHS.git
 ```
 
 2. Перейти в директорию проекта:
