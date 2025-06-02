@@ -7,7 +7,15 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from models import *
+# extend path to include src/*
+import sys
+import os
+
+sys.path.insert(0, os.getcwd())  # /app
+sys.path.insert(0, os.path.join(os.getcwd(), 'src'))  # /app/src
+
+from models.models import *
+
 from main import Base
 
 import sys
@@ -30,7 +38,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata 
 
 # set url the safe way
-from db_credentials import settings
+from config.db_credentials import settings
 
 DB_URL = f'mysql+pymysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}'
 

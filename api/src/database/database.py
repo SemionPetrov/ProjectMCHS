@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-from db_credentials import settings
+from config.db_credentials import settings
 
 """sqlalchemy connection"""
 

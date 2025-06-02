@@ -1,6 +1,6 @@
 FROM python:3.13.3-bookworm
 
-WORKDIR /app
+WORKDIR /app/src
 
 COPY . .
 RUN pip install -r requirements.txt
@@ -10,5 +10,8 @@ EXPOSE 8000
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
+
+COPY wait-for /usr/bin/
+RUN chmod +x /usr/bin/wait-for
 
 CMD ["entrypoint.sh"]

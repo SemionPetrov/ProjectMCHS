@@ -1,10 +1,7 @@
-from re import M
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
-from pydantic_settings import BaseSettings
 
-import models
-from database import Base, engine, get_db
+from database.database import Base, engine, get_db
 
 # 
 app = FastAPI()
@@ -21,7 +18,7 @@ def test_database_connection():
 @app.post("/dbtest")
 def execute_query(query: str):
     from sqlalchemy import text
-    from database import engine 
+    from database.database import engine 
 
 
     with engine.connect() as connection:
@@ -53,7 +50,7 @@ def execute_query(query: str):
 @app.get("/db/erdiagram")
 def build_er_diagram():
     from eralchemy import render_er 
-    from database import Base
+    from database.database import Base
     
     filename = 'db_er_diagram.png'
     render_er(Base, filename)

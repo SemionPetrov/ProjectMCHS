@@ -1,6 +1,6 @@
 # ProjectMCHS
 
-![uml](./imgs/uml_diag_dark.png)
+![uml](./docs/imgs/uml_diag_dark.png)
 
 [google диск с тз](https://drive.google.com/drive/folders/1O8I7lcUWHXA4Z6xpvW2Tnp-mM9MzI16N)
 
@@ -34,10 +34,10 @@ docker compose up --build
 
 ## Работа с БД
 
-Теперь таблицы создаются из файла *./api/models.py*.
+Теперь таблицы создаются из файла *./api/src/models.py*.
 Алгоритм изменения БД:
 
-1. Вносим изменения в *./api/models.py*
+1. Вносим изменения в *./api/src/models.py*
 Примеров достаточно, если че гуглится по sqlalchemy models.
 
 2. Найти *CONTAINER ID* контейнера *projectmchs-api* из:
