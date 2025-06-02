@@ -17,7 +17,7 @@ git clone https://github.com/SemionPetrov/ProjectMCHS.git
 2. Перейти в директорию проекта:
 
 ```shell
-cd projectmchs
+cd ProjectMCHS 
 ```
 3. Запустить контейнеры:
 
