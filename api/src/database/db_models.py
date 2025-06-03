@@ -8,7 +8,7 @@ from database.db_connector import Base
 
 
 # Association tables for many-to-many relationships
-user_privileges = Table('employee_privileges', Base.metadata,
+user_privileges = Table('user_privileges', Base.metadata,
     Column('user_id', Integer, ForeignKey('user.id')),
     Column('privilege_id', Integer, ForeignKey('privilege.id'))
 )
@@ -19,6 +19,13 @@ class Privilege(Base):
     
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
+    
+    users = relationship(
+    "User",
+    secondary=user_privileges,
+    back_populates="privileges"
+)
+
 
 # Define the Employee model
 class Employee(Base):
@@ -42,8 +49,6 @@ class Employee(Base):
     # Relationships
     position = relationship("Position", back_populates="employees")
     rang = relationship("Rang", back_populates="employees")
-    privileges = relationship("Privilege", secondary=user_privileges,
-                           back_populates="employees")
     attestations = relationship("Attestation", back_populates="employee")
     exercises = relationship("Exercise", back_populates="employee")
     exercises_reports = relationship("ExercisesReport", back_populates="employee")
@@ -144,7 +149,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     employee_id = Column(Integer, ForeignKey('employee.id'), nullable=True)
     login = Column(String(50), nullable=True)
-    password_hash = Column(String(50), nullable=True)
+    password_hash = Column(String(255), nullable=True)
     password_expiration = Column(DateTime, nullable=True)
     token = Column(String(50), nullable=True)
     created = Column(DateTime, default=datetime.now(timezone.utc))
@@ -153,3 +158,9 @@ class User(Base):
                    onupdate=datetime.now(timezone.utc))
     # Relationship
     employee = relationship("Employee")
+
+    privileges = relationship(
+        "Privilege",
+        secondary=user_privileges,
+        back_populates="users"
+    )

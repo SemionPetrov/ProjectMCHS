@@ -1,5 +1,9 @@
 from fastapi import APIRouter
+from fastapi import Depends
+
 from database.db_connector import get_db
+from authentication.auth import PermissionChecker, LoginRequest, authenticate_user, create_access_token
+
 
 router = APIRouter(
         prefix="/test",
@@ -44,3 +48,23 @@ def execute_query(query: str):
                 "query": query,
                 "error": str(e)
             } 
+
+
+@router.post("/login")
+def login(request: LoginRequest):
+     user = authenticate_user(request.username, request.password)
+     token = create_access_token(user.dict())
+     return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/items", dependencies=[Depends(PermissionChecker(["read:items"]))])
+def read_items():
+    return {"message": "You can view items"}
+
+@router.post("/items", dependencies=[Depends(PermissionChecker(["write:items"]))])
+def create_item():
+    return {"message": "You can create items"}
+
+@router.get("/users", dependencies=[Depends(PermissionChecker(["read:users"]))])
+def read_users():
+    return {"message": "You can view users"}
+
