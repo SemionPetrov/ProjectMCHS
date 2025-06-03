@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Table, Enum, Time, Text, SmallInteger
 from sqlalchemy.orm import relationship
-from database.database import Base
 from datetime import datetime
+
+from database.db_connector import Base
 
 """sqlalchemy and pydantic models"""
 

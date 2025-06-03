@@ -14,7 +14,7 @@ import os
 sys.path.insert(0, os.getcwd())  # /app
 sys.path.insert(0, os.path.join(os.getcwd(), 'src'))  # /app/src
 
-from models.models import *
+from database.db_models import *
 
 from main import Base
 

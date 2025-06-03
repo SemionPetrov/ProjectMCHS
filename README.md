@@ -34,10 +34,10 @@ docker compose up --build
 
 ## Работа с БД
 
-Теперь таблицы создаются из файла *./api/src/models.py*.
+Теперь таблицы создаются из файла *./api/src/database/db_models.py*.
 Алгоритм изменения БД:
 
-1. Вносим изменения в *./api/src/models.py*
+1. Вносим изменения в *./api/src/database/db_models.py*.
 Примеров достаточно, если че гуглится по sqlalchemy models.
 
 2. Найти *CONTAINER ID* контейнера *projectmchs-api* из:
