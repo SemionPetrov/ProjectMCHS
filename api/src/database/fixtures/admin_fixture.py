@@ -31,9 +31,13 @@ def grant_admin_privilege(db_session):
     if not admin_privilege:
         raise ValueError(f"{admin_user_credentials.ADMIN_PRIVILEGE_NAME} privilege not found! Please create the ADMIN privilege first")
     
+    # Check if privilege already exists
+    if admin_privilege in admin_user.privileges:
+        print(f"Privilege {admin_user_credentials.ADMIN_PRIVILEGE_NAME} already exists for user {admin_user_credentials.ADMIN_USERNAME}")
+        return
+    
     admin_user.privileges.append(admin_privilege)
     db_session.commit()
-
 
 def create_admin_user(db_session):
     """Creates admin user with ADMIN privilege."""
