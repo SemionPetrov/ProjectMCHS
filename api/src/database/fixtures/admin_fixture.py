@@ -2,21 +2,18 @@ from database.db_connector import  SessionLocal
 import bcrypt
 from datetime import datetime, timezone
 
-from database.db_models import User, Privilege, user_privileges
+from database.db_models import User, Privilege
 from config.admin_user import admin_user_credentials
-
-
-ADMIN_PRIVILEGE_NAME = "Admin"
 
 
 def create_admin_privilege(db_session):
     """Creates the ADMIN privilege if it doesn't exist."""
     admin_privilege = db_session.query(Privilege).filter(
-        Privilege.name == ADMIN_PRIVILEGE_NAME
+        Privilege.name == admin_user_credentials.ADMIN_PRIVILEGE_NAME
     ).first()
     
     if not admin_privilege:
-        admin_privilege = Privilege(name=ADMIN_PRIVILEGE_NAME)
+        admin_privilege = Privilege(name=admin_user_credentials.ADMIN_PRIVILEGE_NAME)
         db_session.add(admin_privilege)
         db_session.flush()
     
@@ -29,10 +26,10 @@ def grant_admin_privilege(db_session):
     if not admin_user:
         raise ValueError(f"Admin user not found! User with login {admin_user_credentials.ADMIN_USERNAME} does not exist")
     
-    admin_privilege = db_session.query(Privilege).filter(Privilege.name == ADMIN_PRIVILEGE_NAME).first()
+    admin_privilege = db_session.query(Privilege).filter(Privilege.name == admin_user_credentials.ADMIN_PRIVILEGE_NAME).first()
     
     if not admin_privilege:
-        raise ValueError(f"{ADMIN_PRIVILEGE_NAME} privilege not found! Please create the ADMIN privilege first")
+        raise ValueError(f"{admin_user_credentials.ADMIN_PRIVILEGE_NAME} privilege not found! Please create the ADMIN privilege first")
     
     admin_user.privileges.append(admin_privilege)
     db_session.commit()
