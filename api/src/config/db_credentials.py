@@ -1,12 +1,28 @@
 from pydantic_settings import BaseSettings
+from os import getenv
 
-"""DO NOT SHARE OR COMMIT IN PROD"""
+
+class EnvVarNotFound(Exception): 
+    def __init__(self, variable):
+        self.variable = variable
+
+    def __str__(self) -> str:
+        return f"Could not find {self.variable} in env!\nCheck local.env!"
+
+
+def getenvvar(var_name: str):
+    var = getenv(var_name)
+    if var == None:
+        raise EnvVarNotFound(var_name)
+    return var
+
+
 
 class Settings(BaseSettings):
-    DB_HOST: str = "mysql"
-    DB_USER: str = "root"
-    DB_PASSWORD: str = "pwd123admin"
-    DB_PORT: int = 3306
-    DB_NAME: str = "projectmchs_db"
+    DB_HOST: str = getenvvar("DATABASE_HOST")
+    DB_USER: str = getenvvar("DATABASE_USERNAME") 
+    DB_PASSWORD: str = getenvvar("DATABASE_PASSWORD") 
+    DB_PORT: int = int(getenvvar("DATABASE_PORT"))
+    DB_NAME: str = getenvvar("DATABASE") 
 
 settings = Settings()
