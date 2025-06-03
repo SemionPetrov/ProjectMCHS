@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Table, Enum, Time, Text, SmallInteger
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 from database.db_connector import Base
 
@@ -8,8 +8,8 @@ from database.db_connector import Base
 
 
 # Association tables for many-to-many relationships
-employee_privileges = Table('employee_privileges', Base.metadata,
-    Column('employee_id', Integer, ForeignKey('employee.id')),
+user_privileges = Table('employee_privileges', Base.metadata,
+    Column('user_id', Integer, ForeignKey('user.id')),
     Column('privilege_id', Integer, ForeignKey('privilege.id'))
 )
 
@@ -25,28 +25,33 @@ class Employee(Base):
     __tablename__ = "employee"
     
     id = Column(Integer, primary_key=True)
-
+    
+    # personal info
     last_name = Column(String(50), nullable=False)
     first_name = Column(String(50), nullable=False)
     surname = Column(String(50), nullable=True)
-
     birthday = Column(Date, nullable=True)
-    position_id = Column(Integer, ForeignKey('dolzhnost.id'))
-    rank_id = Column(Integer, ForeignKey('rang.id'))
     
+    # service info
+    position_id = Column(Integer, ForeignKey('position.id'))
+    rang_id = Column(Integer, ForeignKey('rang.id'))
+    
+    # whatever needs to be added
+    comment = Column(Text)
+
     # Relationships
-    position = relationship("Dolzhnost", back_populates="employees")
-    rank = relationship("Rang", back_populates="employees")
-    privileges = relationship("Privilege", secondary=employee_privileges,
+    position = relationship("Position", back_populates="employees")
+    rang = relationship("Rang", back_populates="employees")
+    privileges = relationship("Privilege", secondary=user_privileges,
                            back_populates="employees")
     attestations = relationship("Attestation", back_populates="employee")
     exercises = relationship("Exercise", back_populates="employee")
     exercises_reports = relationship("ExercisesReport", back_populates="employee")
-    1
 
-# Define the Dolzhnost model
-class Dolzhnost(Base):
-    __tablename__ = "dolzhnost"
+
+# Define the Position model
+class Position(Base):
+    __tablename__ = "position"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
@@ -66,7 +71,7 @@ class Rang(Base):
     preparatory_period = Column(Time, nullable=False)
     
     # Relationship
-    employees = relationship("Employee", back_populates="rank")
+    employees = relationship("Employee", back_populates="rang")
 
 # Define the Attestation model
 class Attestation(Base):
@@ -132,32 +137,6 @@ class ExercisesReport(Base):
     exercise = relationship("Exercise")
     employee = relationship("Employee", back_populates="exercises_reports")
 
-# Define the UserAuthentication model
-class UserAuthentication(Base):
-    __tablename__ = "userauthentication"
-    
-    id = Column(Integer, primary_key=True)
-    email = Column(String(100), nullable=False, unique=True)
-    password_hash = Column(String(255), nullable=False)
-    token = Column(String(255))
-    created_at = Column(DateTime, default=datetime.now())
-    
-    # Relationship
-    authentication_tokens = relationship("AuthenticationToken", back_populates="user")
-
-# Define the AuthenticationToken model
-class AuthenticationToken(Base):
-    __tablename__ = "authenticationtokens"
-    
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('userauthentication.id'))
-    token = Column(String(255), nullable=False)
-    expires_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.now())
-    
-    # Relationship
-    user = relationship("UserAuthentication", back_populates="authentication_tokens")
-    
 # Define the User model
 class User(Base):
     __tablename__ = 'user'
@@ -168,4 +147,9 @@ class User(Base):
     password_hash = Column(String(50), nullable=True)
     password_expiration = Column(DateTime, nullable=True)
     token = Column(String(50), nullable=True)
+    created = Column(DateTime, default=datetime.now(timezone.utc))
+
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), 
+                   onupdate=datetime.now(timezone.utc))
+    # Relationship
     employee = relationship("Employee")
