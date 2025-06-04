@@ -1,24 +1,21 @@
 from fastapi import APIRouter
+from database.db_connector import get_db
+from authentication.auth import LoginRequest, authenticate_user, create_access_token, PermissionChecker
+from config.admin_user import admin_user_credentials
 from fastapi import Depends
 
-from database.db_connector import get_db
-from authentication.auth import PermissionChecker, LoginRequest, authenticate_user, create_access_token
-
-
 router = APIRouter(
-        prefix="/test",
-        tags=["test"]
+        prefix="/admin",
+        tags=["admin"]
         )
 
-
-@router.get("/dbtest")
-def test_database_connection():
-    db = get_db()
-    return {"status": "connected", "connection": db}
+@router.get("/admin_dashboard")
+def admin_dashboard(permission_checker: PermissionChecker = Depends(PermissionChecker([admin_user_credentials.ADMIN_PRIVILEGE_NAME]))):
+    return {"message": "Welcome to admin dashboard!"}
 
 
-@router.post("/dbtest")
-def execute_query(query: str):
+@router.post("/db_run_query", tags=["dangerous"])
+def execute_query(query:str, permission_checker: PermissionChecker = Depends(PermissionChecker([admin_user_credentials.ADMIN_PRIVILEGE_NAME]))):
     from sqlalchemy import text
     from database.db_connector import engine 
 
@@ -48,23 +45,3 @@ def execute_query(query: str):
                 "query": query,
                 "error": str(e)
             } 
-
-
-@router.post("/login")
-def login(request: LoginRequest):
-     user = authenticate_user(request.username, request.password)
-     token = create_access_token(user.dict())
-     return {"access_token": token, "token_type": "bearer"}
-
-@router.get("/items", dependencies=[Depends(PermissionChecker(["read:items"]))])
-def read_items():
-    return {"message": "You can view items"}
-
-@router.post("/items", dependencies=[Depends(PermissionChecker(["write:items"]))])
-def create_item():
-    return {"message": "You can create items"}
-
-@router.get("/users", dependencies=[Depends(PermissionChecker(["read:users"]))])
-def read_users():
-    return {"message": "You can view users"}
-

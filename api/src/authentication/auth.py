@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-def get_user_by_login(db: Session, login: str):
+def get_user_by_login(login: str, db: Session):
     return db.query(User).filter(User.login == login).first()
 
 def get_user_privileges(db: Session, user_id: int):
@@ -20,8 +20,9 @@ def get_user_privileges(db: Session, user_id: int):
         User, Privilege.users
     ).filter(User.id == user_id).all()
 
-def authenticate_user(login: str, password: str, db: Session = Depends(get_db)) -> User:
-    login_candidate = get_user_by_login(db, login)
+
+def authenticate_user(login: str, password: str, db: Session) -> User:
+    login_candidate = get_user_by_login( login, db)
     
     if not login_candidate:
         raise HTTPException(
@@ -37,8 +38,11 @@ def authenticate_user(login: str, password: str, db: Session = Depends(get_db)) 
         
     return login_candidate
 
+
+# TODO: fix this
 def get_payload_secret_key():
     return "secret_key"
+
 
 def create_access_token(user: User, db: Session = Depends(get_db)) -> str:
     privileges = [privilege.name for privilege in get_user_privileges(db, user.id)]
@@ -52,7 +56,7 @@ def create_access_token(user: User, db: Session = Depends(get_db)) -> str:
     return token
 
 class PermissionChecker:
-    def __init__(self, required_permissions: List[str]) -> None:
+    def __init__(self, required_permissions: List[str] | List[None]) -> None:
         self.required_permissions = required_permissions
 
     def __call__(self, token: str = Depends(oauth2_scheme)) -> None:
@@ -60,11 +64,11 @@ class PermissionChecker:
             payload = jwt.decode(token, get_payload_secret_key(), algorithms=["HS256"])
             user_permissions = payload.get("permissions", [])
             
-            # Fix: Check permissions as whole strings, not individual characters
+
             missing_permissions = [
                 perm for perm in self.required_permissions 
                 if perm not in user_permissions
-            ]
+            ] if self.required_permissions != None else None
             
             if missing_permissions:
                 raise HTTPException(
