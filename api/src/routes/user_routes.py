@@ -1,21 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from database.db_connector import get_db
-from authentication.auth import LoginRequest, authenticate_user, create_access_token, PermissionChecker
-from config.admin_user import admin_user_credentials
 from sqlalchemy.orm import Session
-from typing import List
-from pydantic import BaseModel
-from authentication.auth import oauth2_scheme, get_payload_secret_key, get_user_by_login
 import jwt
 
-
-class UserPrivilegesResponse(BaseModel):
-    privileges: List[str]
+from authentication.auth import oauth2_scheme, get_payload_secret_key, get_user_by_login
+from database.db_connector import get_db
+from models.pydantic_models import  UserPrivilegesResponse
 
 
 router = APIRouter(
         prefix="/user",
         tags=["user"])
+
 
 @router.get("/privileges", response_model=UserPrivilegesResponse)
 def get_user_privileges(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):

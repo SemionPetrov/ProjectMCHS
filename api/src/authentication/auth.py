@@ -1,14 +1,13 @@
 from datetime import datetime, timezone, timedelta
 from typing import List
-from pydantic import BaseModel
+from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 import bcrypt
+
 from database.db_models import User, Privilege
 from database.db_connector import get_db
-from sqlalchemy.orm import Session
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -87,6 +86,3 @@ class PermissionChecker:
                 detail="Invalid token"
             )
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str

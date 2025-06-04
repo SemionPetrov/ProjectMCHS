@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from database.db_connector import get_db
-from authentication.auth import LoginRequest, authenticate_user, create_access_token
+from authentication.auth import authenticate_user, create_access_token
 from fastapi import Depends
 from sqlalchemy.orm import Session
-
+from models.pydantic_models import LoginRequest
 
 router = APIRouter(
         prefix="/auth",

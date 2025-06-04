@@ -1,8 +1,8 @@
-from fastapi import APIRouter
-from database.db_connector import get_db
-from authentication.auth import LoginRequest, authenticate_user, create_access_token, PermissionChecker
+from fastapi import APIRouter, Depends
+
+from authentication.auth import  PermissionChecker
 from config.admin_user import admin_user_credentials
-from fastapi import Depends
+
 
 router = APIRouter(
         prefix="/admin",
