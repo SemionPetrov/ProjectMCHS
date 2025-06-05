@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Table, Enum, Time, Text, SmallInteger, update, delete
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Table, Enum, Time, Text, SmallInteger
 from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
+from datetime import datetime
 
 from database.db_connector import Base
+from config.db_timezone import prefered_timezone
 
 """
 SQLalchemy models sourced by sqlalchemy
@@ -17,15 +18,17 @@ Column('user_id',
            ForeignKey(
                'user.id', 
                 ondelete='CASCADE', 
-                onupdate='CASCADE'),
+                onupdate='CASCADE'
+            ),
             primary_key=True
         ),
 Column('privilege_id', 
            Integer, 
            ForeignKey(
                'privilege.id', 
-               ondelete='CASCADE', 
-               onupdate='CASCADE'),
+               ondelete='RESTRICT', 
+               onupdate='CASCADE'
+            ),
             primary_key=True
         )
 )
@@ -74,7 +77,9 @@ class Employee(Base):
     position_id = Column(
             Integer, 
             ForeignKey(
-                'position.id'
+                'position.id',
+                ondelete='RESTRICT', 
+                onupdate='CASCADE'
             ),
             primary_key=True
         )
@@ -165,7 +170,8 @@ class Rang(Base):
     # Relationship
     employees = relationship(
             "Employee", 
-            back_populates="rang"
+            back_populates="rang",
+            cascade="save-update"
     )
 
 # Define the Attestation model
@@ -333,6 +339,7 @@ class ExerciseReport(Base):
             foreign_keys="[ExerciseReport.employee_id]"
     )
 
+
 # Define the User model
 class User(Base):
     __tablename__ = 'user'
@@ -348,24 +355,28 @@ class User(Base):
     )
     login = Column(
             String(50), 
-            nullable=True,
+            nullable=False,
             unique=True
     )
     password_hash = Column(
             String(255), 
-            nullable=True
+            nullable=False
     )
     password_expiration = Column(
-            DateTime, 
+            DateTime
     )
     created = Column(
-            DateTime, default=datetime.now(timezone.utc)
+            DateTime, 
+            default=datetime.now(prefered_timezone),
+            nullable=False
     )
 
     updated_at = Column(
             DateTime, 
-            default=datetime.now(timezone.utc), 
-            onupdate=datetime.now(timezone.utc)
+            default=datetime.now(prefered_timezone), 
+            onupdate=datetime.now(prefered_timezone),
+            nullable=False
+
     )
 
     # Relationship
