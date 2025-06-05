@@ -44,6 +44,7 @@ package Администрирование as administartion{
     usecase "Управление привилегиями" as access_control
     usecase "Управление базой данных" as db_control
     usecase "Доступ к технической информации" as backend_info
+    usecase "Обработка новых аккаунтов" as new_acc_aprove
 }
 
 package "Проверка привилегий" as priv_check {
@@ -78,6 +79,7 @@ certification_management_priv --> certification
 planning_sessions_priv --> exercise
 
 access_control_priv --> access_control
+access_control ..> new_acc_aprove
 db_control_priv --> db_control
 backend_info_priv --> backend_info
 
@@ -90,6 +92,3 @@ read_exercise_report <.. exercise_report_management <<extend>>
 read_employee_data <.. employee_data_management <<extend>>
 
 @enduml
-
-
-
