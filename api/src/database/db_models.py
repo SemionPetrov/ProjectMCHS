@@ -9,15 +9,10 @@ SQLalchemy models sourced by sqlalchemy
 use alembic to migrade db after chages
 """
 
-#TODO:
-# Identifying relationship
-#   Foreign key must reference PK (the entire PK, 
-#   not portion of PK) or unique index. So add this between create table [Configuration] and [Mail].
-
 
 # Association tables for many-to-many relationships
 user_privileges = Table('user_privileges', Base.metadata,
-    Column('user_id', 
+Column('user_id', 
            Integer, 
            ForeignKey(
                'user.id', 
@@ -76,8 +71,19 @@ class Employee(Base):
     birthday = Column(Date, nullable=True)
     
     # service info
-    position_id = Column(Integer, ForeignKey('position.id'))
-    rang_id = Column(Integer, ForeignKey('rang.id'))
+    position_id = Column(
+            Integer, 
+            ForeignKey(
+                'position.id'
+            ),
+            primary_key=True
+        )
+            
+    rang_id = Column(
+            Integer, 
+            ForeignKey('rang.id'),
+            primary_key=True
+        )
     
     # whatever needs to be added
     comment = Column(Text)
@@ -178,7 +184,8 @@ class Attestation(Base):
     )
     type_id = Column(
             Integer, 
-            ForeignKey('attestationtype.id')
+            ForeignKey('attestationtype.id'),
+            primary_key=True
     )
     status = Column(
             Integer, 
@@ -235,7 +242,8 @@ class Exercise(Base):
     )
     exercise_type_id = Column(
             Integer, 
-            ForeignKey('exercisetype.id')
+            ForeignKey('exercisetype.id'),
+            primary_key=True
     )
     date = Column(
             Date, 
