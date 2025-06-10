@@ -9,6 +9,11 @@ import bcrypt
 from database.db_models import User, Privilege
 from database.db_connector import get_db
 
+"""
+Authentication related code,
+used by api
+"""
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def get_user_by_login(login: str, db: Session):

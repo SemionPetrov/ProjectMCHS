@@ -5,7 +5,10 @@ from typing import Generator
 
 from config.db_credentials import settings
 
-"""sqlalchemy connection"""
+"""
+SQLalchemy connection handler,
+import get_db to get session
+"""
 
 engine = create_engine(
         f'mysql+pymysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}',

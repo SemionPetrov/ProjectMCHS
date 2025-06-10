@@ -1,6 +1,12 @@
 from pydantic_settings import BaseSettings
 from config.env_handlels import getenvvar
 
+"""
+Handles db info given by env vars
+import settings to get them.
+Used by main to create db connection.
+"""
+
 class Settings(BaseSettings):
     DB_HOST: str = getenvvar("DATABASE_HOST")
     DB_USER: str = getenvvar("DATABASE_USERNAME") 

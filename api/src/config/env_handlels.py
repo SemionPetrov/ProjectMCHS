@@ -1,5 +1,10 @@
 from os import getenv
 
+"""
+Simple way to get env vars.
+With related exception.
+"""
+
 class EnvVarNotFound(Exception): 
     def __init__(self, variable):
         self.variable = variable

@@ -14,23 +14,23 @@ use alembic to migrade db after chages
 # Association tables for many-to-many relationships
 user_privileges = Table('user_privileges', Base.metadata,
 Column('user_id', 
-           Integer, 
-           ForeignKey(
-               'user.id', 
-                ondelete='CASCADE', 
-                onupdate='CASCADE'
-            ),
-            primary_key=True
+       Integer, 
+       ForeignKey(
+           'user.id', 
+            ondelete='CASCADE', 
+            onupdate='CASCADE'
+        ),
+        primary_key=True
         ),
 Column('privilege_id', 
-           Integer, 
-           ForeignKey(
-               'privilege.id', 
-               ondelete='RESTRICT', 
-               onupdate='CASCADE'
-            ),
-            primary_key=True
-        )
+       Integer, 
+       ForeignKey(
+           'privilege.id', 
+           ondelete='RESTRICT', 
+           onupdate='CASCADE'
+        ),
+        primary_key=True
+    )
 )
 
 # Define the Privilege model
@@ -38,13 +38,13 @@ class Privilege(Base):
     __tablename__ = "privilege"
     
     id = Column(
-            Integer, 
-            primary_key=True, 
-            autoincrement=True
+        Integer, 
+        primary_key=True, 
+        autoincrement=True
     )
     name = Column(
-            String(50), 
-            nullable=False
+        String(50), 
+        nullable=False
     )
     
     # Relationships
@@ -54,7 +54,7 @@ class Privilege(Base):
         back_populates="privileges",
         passive_deletes=True,
         passive_updates=True
-)
+    )
 
 
 # Define the Employee model
@@ -62,9 +62,9 @@ class Employee(Base):
     __tablename__ = "employee"
     
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     
     # personal info
@@ -75,50 +75,54 @@ class Employee(Base):
     
     # service info
     position_id = Column(
-            Integer, 
-            ForeignKey(
-                'position.id',
-                ondelete='RESTRICT', 
-                onupdate='CASCADE'
-            ),
-            primary_key=True
-        )
+        Integer, 
+        ForeignKey(
+            'position.id',
+            ondelete='RESTRICT', 
+            onupdate='CASCADE'
+        ),
+        primary_key=True
+    )
             
     rang_id = Column(
-            Integer, 
-            ForeignKey('rang.id'),
-            primary_key=True
-        )
+        Integer, 
+        ForeignKey(
+            'rang.id',
+            ondelete='RESTRICT', 
+            onupdate='CASCADE'
+            ),
+        primary_key=True
+    )
     
     # whatever needs to be added
     comment = Column(Text)
 
     # Relationships
     position = relationship(
-            "Position", 
-            back_populates="employees"
+        "Position", 
+        back_populates="employees"
     )
     rang = relationship(
-            "Rang", 
-            back_populates="employees"
+        "Rang", 
+        back_populates="employees"
     )
     attestations = relationship(
-            "Attestation", 
-            back_populates="employee",
-            foreign_keys="[Attestation.employee_id]",
-            cascade="all, delete-orphan"
+        "Attestation", 
+        back_populates="employee",
+        foreign_keys="[Attestation.employee_id]",
+        cascade="all, delete-orphan"
     )
     exercises = relationship(
-            "Exercise", 
-            back_populates="employee",
-            foreign_keys="[Exercise.employee_id]",
-            cascade="all, delete-orphan"
+        "PendingExercise", 
+        back_populates="employee",
+        foreign_keys="[PendingExercise.employee_id]",
+        cascade="all, delete-orphan"
     )
     exercises_reports = relationship(
-            "ExerciseReport", 
-            back_populates="employee",
-            foreign_keys="[ExerciseReport.employee_id]",
-            cascade="all, delete-orphan"
+        "ExerciseReport", 
+        back_populates="employee",
+        foreign_keys="[ExerciseReport.employee_id]",
+        cascade="all, delete-orphan"
     )
 
 
@@ -127,13 +131,13 @@ class Position(Base):
     __tablename__ = "position"
 
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     name = Column(
-            String(50), 
-            nullable=False
+        String(50), 
+        nullable=False
     )
 
     group_position = Column(Enum(
@@ -145,8 +149,8 @@ class Position(Base):
     
     # Relationship
     employees = relationship(
-            "Employee", 
-            back_populates="position"
+        "Employee", 
+        back_populates="position"
     )
 
 # Define the Rang model
@@ -154,24 +158,24 @@ class Rang(Base):
     __tablename__ = "rang"
     
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     name = Column(
-            String(50), 
-            nullable=False
+        String(50), 
+        nullable=False
     )
     preparatory_period = Column(
-            Time, 
-            nullable=False
+        Time, 
+        nullable=False
     )
     
     # Relationship
     employees = relationship(
-            "Employee", 
-            back_populates="rang",
-            cascade="save-update"
+        "Employee", 
+        back_populates="rang",
+        cascade="save-update"
     )
 
 # Define the Attestation model
@@ -179,43 +183,43 @@ class Attestation(Base):
     __tablename__ = "attestation"
     
     id = Column(
-            Integer, 
-            primary_key=True, 
-            autoincrement=True
+        Integer, 
+        primary_key=True, 
+        autoincrement=True
     )
     employee_id = Column(
-            Integer, 
-            ForeignKey('employee.id'),
-            primary_key=True
+        Integer, 
+        ForeignKey('employee.id'),
+        primary_key=True
     )
     type_id = Column(
-            Integer, 
-            ForeignKey('attestationtype.id'),
-            primary_key=True
+        Integer, 
+        ForeignKey('attestationtype.id'),
+        primary_key=True
     )
     status = Column(
-            Integer, 
-            nullable=False
+        Integer, 
+        nullable=False
     )
     no_attestation_reason = Column(
-            String(255)
+        String(255)
     )
     date = Column(
-            Date, 
-            nullable=False
+        Date, 
+        nullable=False
     )
     examination_date = Column(
-            Date
+        Date
     )
     
     # Relationships
     employee = relationship(
-            "Employee", 
-            back_populates="attestations",
-            foreign_keys="[Attestation.employee_id]"
+        "Employee", 
+        back_populates="attestations",
+        foreign_keys="[Attestation.employee_id]"
     )
     type = relationship(
-            "AttestationType"
+        "AttestationType"
     )
 
 # Define the AttestationType model
@@ -223,51 +227,52 @@ class AttestationType(Base):
     __tablename__ = "attestationtype"
     
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     name = Column(
-            String(50), 
-            nullable=False
+        String(50), 
+        nullable=False
     )
 
-# Define the Exercise model
-class Exercise(Base):
+# TODO rename to PENDING exercise
+# Define the PendinExercise model
+class PendingExercise(Base):
     __tablename__ = "exercise"
     
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     employee_id = Column(
-            Integer, 
-            ForeignKey('employee.id'),
-            primary_key=True
+        Integer, 
+        ForeignKey('employee.id'),
+        primary_key=True
     )
     exercise_type_id = Column(
-            Integer, 
-            ForeignKey('exercisetype.id'),
-            primary_key=True
+        Integer, 
+        ForeignKey('exercisetype.id'),
+        primary_key=True
     )
     date = Column(
-            Date, 
-            nullable=False
+        Date, 
+        nullable=False
     )
     address = Column(
-            String(255), 
-            nullable=False
+        String(255), 
+        nullable=False
     )
     
     # Relationships
     employee = relationship(
-            "Employee", 
-            back_populates="exercises",
-            foreign_keys="[Exercise.employee_id]"
+        "Employee", 
+        back_populates="exercises",
+        foreign_keys="[PendingExercise.employee_id]"
     )
     type = relationship(
-            "ExerciseType"
+        "ExerciseType"
     )
 
 # Define the ExerciseType model
@@ -275,13 +280,13 @@ class ExerciseType(Base):
     __tablename__ = "exercisetype"
     
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     name = Column(
-            String(100), 
-            nullable=False
+        String(100), 
+        nullable=False
     )
 
 # Define the ExerciseReport model
@@ -289,54 +294,54 @@ class ExerciseReport(Base):
     __tablename__ = "exercisesreport"
     
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     exercise_id = Column(
-            Integer, 
-            ForeignKey('exercise.id'),
-            primary_key=True
+        Integer, 
+        ForeignKey('exercise.id'),
+        primary_key=True
     )
     employee_id = Column(
-            Integer, 
-            ForeignKey('employee.id'),
-            primary_key=True
+        Integer, 
+        ForeignKey('employee.id'),
+        primary_key=True
     )
     start_date = Column(
-            Date, 
-            nullable=False
+        Date, 
+        nullable=False
     )
     finish_date = Column(
-            Date, 
-            nullable=False
+        Date, 
+        nullable=False
     )
     count_plan = Column(
-            SmallInteger, 
-            nullable=False
+        SmallInteger, 
+        nullable=False
     )
     count_actual = Column(
-            SmallInteger, 
-            nullable=False
+        SmallInteger, 
+        nullable=False
     )
     count_reason = Column(
-            Enum(
-                'Отсутствие ХП-И', 
-                'Отсутствие кислорода', 
-                'Отсутствие воздуха', 
-                'Пожар', 
-                'Запрет выездов', 
-                'Прочее'),
-            nullable=False
+        Enum(
+            'Отсутствие ХП-И', 
+            'Отсутствие кислорода', 
+            'Отсутствие воздуха', 
+            'Пожар', 
+            'Запрет выездов', 
+            'Прочее'),
+        nullable=False
     )
     comment = Column(Text)
     
     # Relationships
-    exercise = relationship("Exercise")
+    exercise = relationship("PendingExercise")
     employee = relationship(
-            "Employee", 
-            back_populates="exercises_reports",
-            foreign_keys="[ExerciseReport.employee_id]"
+        "Employee", 
+        back_populates="exercises_reports",
+        foreign_keys="[ExerciseReport.employee_id]"
     )
 
 
@@ -345,38 +350,37 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(
-            Integer, 
-            primary_key=True,
-            autoincrement=True
+        Integer, 
+        primary_key=True,
+        autoincrement=True
     )
     employee_id = Column(
-            Integer, 
-            ForeignKey('employee.id'), 
+        Integer, 
+        ForeignKey('employee.id')
     )
     login = Column(
-            String(50), 
-            nullable=False,
-            unique=True
+        String(50), 
+        nullable=False,
+        unique=True
     )
     password_hash = Column(
-            String(255), 
-            nullable=False
+        String(255), 
+        nullable=False
     )
     password_expiration = Column(
-            DateTime
+        DateTime
     )
     created = Column(
-            DateTime, 
-            default=datetime.now(prefered_timezone),
-            nullable=False
+        DateTime, 
+        default=datetime.now(prefered_timezone),
+        nullable=False
     )
 
     updated_at = Column(
-            DateTime, 
-            default=datetime.now(prefered_timezone), 
-            onupdate=datetime.now(prefered_timezone),
-            nullable=False
-
+        DateTime, 
+        default=datetime.now(prefered_timezone), 
+        onupdate=datetime.now(prefered_timezone),
+        nullable=False
     )
 
     # Relationship
