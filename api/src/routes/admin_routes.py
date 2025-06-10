@@ -9,13 +9,44 @@ router = APIRouter(
         tags=["admin"]
         )
 
-@router.get("/admin_dashboard")
-def admin_dashboard(permission_checker: PermissionChecker = Depends(PermissionChecker([admin_user_credentials.ADMIN_PRIVILEGE_NAME]))):
+@router.get("/dashboard")
+def admin_dashboard(
+        permission_checker: PermissionChecker = 
+            Depends(PermissionChecker(
+                [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+    ):
     return {"message": "Welcome to admin dashboard!"}
 
 
+# TODO make model for this
+@router.get("/list_privileges")
+def admin_liist_privileges(
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker(
+            [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+    ):
+    return {"mesasge": "Not implimented"}
+
+
+# TODO make model for this
+@router.put("/change_privileges")
+def admin_change_privileges(
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker(
+            [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+    ):
+    return {"mesasge": "Not implimented"}
+
+
+
 @router.post("/db_run_query", tags=["dangerous"])
-def execute_query(query:str, permission_checker: PermissionChecker = Depends(PermissionChecker([admin_user_credentials.ADMIN_PRIVILEGE_NAME]))):
+def execute_query(
+        query:str, 
+        permission_checker: PermissionChecker = 
+            Depends(PermissionChecker(
+                [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+    ):
+
     from sqlalchemy import text
     from database.db_connector import engine 
 

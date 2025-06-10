@@ -5,11 +5,37 @@ import jwt
 from authentication.auth import oauth2_scheme, get_payload_secret_key, get_user_by_login
 from database.db_connector import get_db
 from models.pydantic_models import  UserPrivilegesResponse
-
+from authentication.auth import PermissionChecker
 
 router = APIRouter(
         prefix="/user",
-        tags=["user"])
+        tags=["account"]
+    )
+
+
+@router.get("/attestations")
+def get_user_attestations(
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker([None]))
+    ):
+    return {"Not implimented"}
+
+
+# TODO make model for that
+@router.put("/change_personal_data")
+def change_personal_data(
+        permission_checker: PermissionChecker = 
+            Depends(PermissionChecker([None]))
+    ):
+    return {"Not implimented"}
+
+
+@router.get("/pending_exercises")
+def pending_exercises(
+        permission_checker: PermissionChecker = 
+            Depends(PermissionChecker([None]))
+    ):
+    return {"Not implimented"}
 
 
 @router.get("/privileges", response_model=UserPrivilegesResponse)
@@ -52,3 +78,4 @@ def get_user_privileges(token: str = Depends(oauth2_scheme), db: Session = Depen
         privileges = [privilege.name for privilege in get_user_privileges(db, user.id)]
 
     return UserPrivilegesResponse(privileges=privileges)
+

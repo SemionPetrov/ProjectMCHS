@@ -14,7 +14,7 @@ Authentication related code,
 used by api
 """
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def get_user_by_login(login: str, db: Session):
     return db.query(User).filter(User.login == login).first()

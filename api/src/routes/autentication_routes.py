@@ -1,9 +1,9 @@
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from authentication.auth import authenticate_user, create_access_token
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-
 
 from models.pydantic_models import LoginRequest
 from database.db_connector import get_db
@@ -14,15 +14,24 @@ router = APIRouter(
         tags=["authentication"])
 
 
-@router.post("/login")
-def login(request: LoginRequest, db: Session = Depends(get_db)):
-    user = authenticate_user(request.username, request.password, db)
+@router.post("/login",  responses={
+    status.HTTP_422_UNPROCESSABLE_ENTITY: {"description": "Validation Error"}
+})
+def login(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)
+    ):
+    user = authenticate_user(form_data.username, form_data.password, db)
     token = create_access_token(user, db)
     return {"access_token": token, "token_type": "bearer"}
 
 
 @router.post("/signup")
-def signup(request: LoginRequest, db: Session = Depends(get_db)):
+def signup(
+        request: LoginRequest, 
+        db: Session = Depends(get_db)
+    ):
+
     user_exists = db.query(User).filter(
     ).first()
     if user_exists:
