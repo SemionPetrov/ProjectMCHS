@@ -18,9 +18,8 @@ def admin_dashboard(
     return {"message": "Welcome to admin dashboard!"}
 
 
-# TODO make model for this
 @router.get("/list_privileges")
-def admin_liist_privileges(
+def admin_list_privileges(
         permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
             [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
@@ -28,15 +27,35 @@ def admin_liist_privileges(
     return {"mesasge": "Not implimented"}
 
 
-# TODO make model for this
-@router.put("/change_privileges")
-def admin_change_privileges(
+@router.get("/list_privileges/{user_id}")
+def admin_user_list_privileges(
+        user_id: str,
         permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
             [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
     ):
-    return {"mesasge": "Not implimented"}
+    return {"mesasge": f"privileges for user {user_id}"}
 
+@router.delete("/privileges/{user_id}/{priv_id}")
+def admin_delete_privilege(
+        user_id: int,
+        priv_id: int,
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker(
+            [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+    ):
+    return {"mesasge": f"removing {priv_id} from {user_id}"}
+
+
+@router.post("/privileges/{user_id}/{priv_id}")
+def admin_add_privilege(
+        user_id: int,
+        priv_id: int,
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker(
+            [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+    ):
+    return {"mesasge": f"adding {priv_id} from {user_id}"}
 
 
 @router.post("/db_run_query", tags=["dangerous"])

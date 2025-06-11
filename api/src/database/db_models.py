@@ -110,19 +110,11 @@ class Employee(Base):
         "Attestation", 
         back_populates="employee",
         foreign_keys="[Attestation.employee_id]",
-        cascade="all, delete-orphan"
     )
     exercises = relationship(
         "PendingExercise", 
         back_populates="employee",
-        foreign_keys="[PendingExercise.employee_id]",
-        cascade="all, delete-orphan"
-    )
-    exercises_reports = relationship(
-        "ExerciseReport", 
-        back_populates="employee",
-        foreign_keys="[ExerciseReport.employee_id]",
-        cascade="all, delete-orphan"
+        foreign_keys="[PendingExercise.employee_id]"
     )
 
 
@@ -189,12 +181,12 @@ class Attestation(Base):
     )
     employee_id = Column(
         Integer, 
-        ForeignKey('employee.id'),
+        ForeignKey('employee.id', onupdate="CASCADE", ondelete="CASCADE"),
         primary_key=True
     )
     type_id = Column(
         Integer, 
-        ForeignKey('attestationtype.id'),
+        ForeignKey('attestationtype.id', onupdate="CASCADE", ondelete="CASCADE"),
         primary_key=True
     )
     status = Column(
@@ -248,12 +240,12 @@ class PendingExercise(Base):
     )
     employee_id = Column(
         Integer, 
-        ForeignKey('employee.id'),
+        ForeignKey('employee.id', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True
     )
     exercise_type_id = Column(
         Integer, 
-        ForeignKey('exercisetype.id'),
+        ForeignKey('exercisetype.id', ondelete="RESTRICT", onupdate="CASCADE"),
         primary_key=True
     )
     date = Column(
@@ -274,6 +266,10 @@ class PendingExercise(Base):
     type = relationship(
         "ExerciseType"
     )
+    exercise_reports = relationship(
+        "ExerciseReport",
+        back_populates="exercise"
+    ) 
 
 # Define the ExerciseType model
 class ExerciseType(Base):
@@ -300,12 +296,7 @@ class ExerciseReport(Base):
     )
     exercise_id = Column(
         Integer, 
-        ForeignKey('exercise.id'),
-        primary_key=True
-    )
-    employee_id = Column(
-        Integer, 
-        ForeignKey('employee.id'),
+        ForeignKey('exercise.id', ondelete='RESTRICT', onupdate='CASCADE'),
         primary_key=True
     )
     start_date = Column(
@@ -337,11 +328,9 @@ class ExerciseReport(Base):
     comment = Column(Text)
     
     # Relationships
-    exercise = relationship("PendingExercise")
-    employee = relationship(
-        "Employee", 
-        back_populates="exercises_reports",
-        foreign_keys="[ExerciseReport.employee_id]"
+    exercise = relationship(
+            "PendingExercise",
+            back_populates="exercise_reports"
     )
 
 
