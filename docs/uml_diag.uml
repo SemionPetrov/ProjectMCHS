@@ -12,15 +12,12 @@ package Авторизация {
 
 package "Кадровая работа" {
     package "Атестация" as certification {
-        usecase "Просмотр запланированных атестаций" as read_planned_sessions
-        usecase "Планирование атестаций" as planning_sessions
-        
         usecase "Просмотр данных об атестации" as read_attestation_report
-        usecase "Добавление данных об атестации" as attestation_report_management
+        usecase "Изменение данных об атестации" as attestation_report_management
     }
     
     package "Управление занятиями" as exercise{
-        usecase "Просмотр запланированных занятий" as read_exercises
+        usecase "Просмотр всех запланированных занятий" as read_exercises
         usecase "Планирование занятий" as exercise_planning
         
         usecase "Просмотр отчетности по занятиям" as read_exercise_report
@@ -83,7 +80,6 @@ access_control ..> new_acc_aprove
 db_control_priv --> db_control
 backend_info_priv --> backend_info
 
-read_planned_sessions <.. planning_sessions <<extend>>
 read_attestation_report <.. attestation_report_management <<extend>>
 
 read_exercises <.. exercise_planning <<extend>>
@@ -92,3 +88,4 @@ read_exercise_report <.. exercise_report_management <<extend>>
 read_employee_data <.. employee_data_management <<extend>>
 
 @enduml
+

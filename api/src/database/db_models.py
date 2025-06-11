@@ -1,3 +1,4 @@
+from enum import unique
 from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Table, Enum, Time, Text, SmallInteger
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -249,7 +250,7 @@ class PendingExercise(Base):
         primary_key=True
     )
     date = Column(
-        Date, 
+        DateTime, 
         nullable=False
     )
     address = Column(
@@ -257,6 +258,10 @@ class PendingExercise(Base):
         nullable=False
     )
     
+    comment = Column(
+        String(255), 
+        nullable=True
+    )
     # Relationships
     employee = relationship(
         "Employee", 
@@ -350,6 +355,11 @@ class User(Base):
     login = Column(
         String(50), 
         nullable=False,
+        unique=True
+    )
+    contact_info = Column(
+        String(100),
+        nullable=True,
         unique=True
     )
     password_hash = Column(
