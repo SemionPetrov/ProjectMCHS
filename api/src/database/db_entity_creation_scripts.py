@@ -27,6 +27,42 @@ def create_privilege(
     privilege = Privilege(name=privilege_name)
     db_session.add(privilege)
     db_session.flush()
+    db_session.commit()
+    return {
+        "success": True,
+        "data": privilege
+    }
+
+
+def grant_privilege_by_ids(
+    db_session, 
+    user_id: int, 
+    privilege_id: int 
+):
+    user = db_session.query(User).filter(User.id == user_id).first()
+    
+    if not user:
+        return {
+            "success": False,
+            "error": f"User with login {user.login} and id {user.id} does not exist"
+        }
+    
+    privilege = db_session.query(Privilege).filter(Privilege.id == privilege_id).first()
+    
+    if not privilege:
+        return {
+            "success": False,
+            "error": f"{privilege.name} privilege not found!"
+        }
+    
+    if privilege in user.privileges:
+        return {
+            "success": False,
+            "error": f"Privilege {privilege.name} already exists for user {user.login}"
+        }
+    
+    user.privileges.append(privilege)
+    db_session.commit()
     return {
         "success": True,
         "data": privilege
@@ -36,7 +72,7 @@ def grant_privilege_by_names(
     db_session, 
     user_login: str, 
     privilege_name: str
-):
+    ):
     user = db_session.query(User).filter(User.login == user_login).first()
     
     if not user:
@@ -66,37 +102,6 @@ def grant_privilege_by_names(
         "data": privilege
     }
 
-def grant_privilege_by_entities(
-    db_session, 
-    user: User, 
-    privilege: Privilege
-):
-    if not user:
-        return {
-            "success": False,
-            "error": f"User with login {user.login} does not exist"
-        }
-    
-    privilege = db_session.query(Privilege).filter(Privilege.name == privilege.name).first()
-    
-    if not privilege:
-        return {
-            "success": False,
-            "error": f"{privilege.name} privilege not found!"
-        }
-    
-    if privilege in user.privileges:
-        return {
-            "success": False,
-            "error": f"Privilege {privilege.name} already exists for user {user.login}"
-        }
-    
-    user.privileges.append(privilege)
-    db_session.commit()
-    return {
-        "success": True,
-        "data": privilege
-    }
 
 def create_user(
     db_session, 
