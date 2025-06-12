@@ -1,5 +1,7 @@
+from pydantic import networks
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
+from database import db_entity_creation_scripts
 from database.db_models import *
 from config.admin_user import admin_user_credentials
 from typing import Optional
@@ -147,3 +149,82 @@ def update_attestation_type(
         "success": True,
         "message": f"Successfully updated attestation {attestation_type.name} with id {attestation_type_id}",
     }
+
+def update_attestation(
+    db_session: Session,
+    attestation_id: int,
+    emplyee_id: int,
+    new_type_id:int,
+    new_status: int,
+    new_date: Date,
+    new_examination_date: Date
+):
+    attestation= db_session.query(Attestation).filter(
+            Attestation.id == attestation_id,
+            Attestation.employee_id == emplyee_id,
+        ).first()
+    
+    if not attestation:
+        return {
+            "success": False,
+            "error": f"AttestationType with id {attestation_type_id} does not exist"
+        }
+    
+    attestation.type_id=new_type_id
+    attestation.status = new_status
+    attestation.date= new_date 
+    attestation.examination_date=new_examination_date 
+    
+    db_session.flush() 
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Successfully updated attestation {attestation.id} for employee {emplyee_id} with",
+    }
+def update_exercise_type(
+    db_session: Session,
+    rang_id: int,
+    name: str,
+):
+    rang = db_session.query(Rang).filter(Rang.id == rang_id).first()
+    
+    if not rang:
+        return {
+            "success": False,
+            "error": f"Rang with id {rang_id} does not exist"
+        }
+    
+    rang.name = name
+    
+    
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Successfully updated rang {rang.name}",
+        "data": rang
+    }
+
+def update_exercise_type(
+    db_session: Session,
+    type_id: int,
+    new_name: str,
+):
+
+    exercise_type= db_session.query(ExerciseType).filter(ExerciseType.id == type_id).first()
+    
+    if not  exercise_type:
+        return {
+            "success": False,
+            "error": f"ExerciseType with id {type_id} does not exist!"
+        }
+    
+    exercise_type.name = new_name
+    
+    db_session.flush() 
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Successfully updated exercise_type {exercise_type.id} to name {exercise_type.name}",
+    }
+
+

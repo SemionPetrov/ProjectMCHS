@@ -188,16 +188,7 @@ def admin_grant_privilege(
 
     result = grant_privilege_by_ids(db, user_id, privilege_id)
     
-    if not result["success"]:
-        return {
-            "success": False,
-            "error": result["error"]
-        }
-    
-    return {
-        "success": True,
-        "message": f"Successfully granted privilege {privilege_id} to user {user_id}"
-    }
+    return result
 
 
 @router.post("/db_run_query", tags=["dangerous"])

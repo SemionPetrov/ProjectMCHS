@@ -138,3 +138,52 @@ def delete_attestation_tpye(
                 "Success" : False,
                 "message" : f"{e}"
                 }
+
+
+def delete_attestation(
+    db_session:Session,
+    attestation_id: int,
+    employee_id: int
+):
+    try:
+        stmt = delete(Attestation).where(
+                Attestation.id == attestation_id,
+                Attestation.employee_id == employee_id)
+        db_session.execute(stmt)
+        db_session.commit()
+        
+        return {
+                "Success" : True,
+                "message" : f"Deleted attestation with id {attestation_id} for employee {employee_id}"
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+        return {
+                "Success" : False,
+                "message" : f"{e}"
+                }
+
+def delete_exercise_type(
+    db_session:Session,
+    exercise_type_id: int,
+):
+    try:
+        stmt = delete(ExerciseType).where(
+                ExerciseType.id == exercise_type_id
+        )
+        db_session.execute(stmt)
+        db_session.flush()
+        db_session.commit()
+        
+        return {
+                "Success" : True,
+                "message" : f"Deleted exercise_type with id {exercise_type_id}!"
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+        return {
+                "Success" : False,
+                "message" : f"{e}"
+                }

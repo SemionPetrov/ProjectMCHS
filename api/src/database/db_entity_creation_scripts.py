@@ -1,3 +1,4 @@
+from starlette.requests import empty_receive
 from database.db_models import *
 import bcrypt
 from datetime import datetime
@@ -62,7 +63,6 @@ def grant_privilege_by_ids(
         }
     
     user.privileges.append(privilege)
-    db_session.flush()
     db_session.commit()
     return {
         "success": True,
@@ -259,6 +259,33 @@ def create_position(
         "message": f"Added position {position.name}!" 
     }
 
+def create_exercise_type(
+    db_session,
+    name: str
+):
+    exercise_type = db_session.query(ExerciseType).filter(
+        ExerciseType.name == name,
+    ).first()
+    
+    if exercise_type:
+        return {
+            "success": False,
+            "error": f"ExerciseType with name {name} already exist with id {exercise_type.id}!"
+        }
+    
+    exercise_type = ExerciseType(
+        name = name
+    )
+
+    db_session.add(exercise_type)
+    db_session.flush() 
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Created exercise_type {exercise_type.name} with id {exercise_type.id}" 
+    }
+
+
 def create_rang(
     db_session,
     name: str,
@@ -364,23 +391,53 @@ def create_attestation(
     employee_id: int,
     type_id: int,
     status: int,
-    no_attestation_reason: Optional[str],
     date: Date,
     examination_date: Optional[Date]
 ):
+
+    attestation = db_session.query(Attestation).filter(
+        Attestation.employee_id == employee_id,
+        Attestation.type_id == type_id,
+        Attestation.status == status,
+        Attestation.date == date
+    ).first()
+    
+    if attestation:
+        return {
+            "success": False,
+            "message": f"Attestation already exists for employee {employee_id} with id {attestation.id}!"
+        }
+
+    attestation_type = db_session.query(AttestationType).filter(
+        AttestationType.id == type_id 
+    ).first()
+    
+    if attestation:
+        return {
+            "success": False,
+            "message": f"Attestation already exists with id {attestation_type.id} for employee {employee_id}!"
+        }
+
+    if not attestation_type:
+        return {
+            "success": False,
+            "message": f"Attestation type {type_id} does not exists with!"
+        }
+
     attestation = Attestation(
         employee_id=employee_id,
         type_id=type_id,
         status=status,
-        no_attestation_reason=no_attestation_reason,
         date=date,
         examination_date=examination_date
     )
+
     db_session.add(attestation)
     db_session.flush()
+    db_session.commit()
     return {
         "success": True,
-        "data": attestation
+        "message": f"Added attestation {attestation.id} for employee {employee_id} on date {date}!"
     }
 
 def create_attestation_type(

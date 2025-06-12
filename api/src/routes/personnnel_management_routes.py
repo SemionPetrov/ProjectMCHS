@@ -181,7 +181,7 @@ def delete_position_route(
     return result    
 
 
-@router.get("/postitions", tags=["positions"])
+@router.get("/all", tags=["positions"])
 def get_positions_list(
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
