@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from typing import Optional, Dict, cast
 from datetime import datetime, date
 
+from starlette.requests import empty_receive
+
 from database.db_connector import get_db
 from authentication.auth import PermissionChecker
 from database.db_entity_creation_scripts import create_employee, create_position, create_rang
@@ -82,21 +84,31 @@ def add_employee(
     return result    
 
 
-@router.get("/get_employee_list", response_model=EmployeeList, tags=["employee"])
+@router.get("/get_employee_list", tags=["employee"])
 def get_personnel_list(
         permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:read"])),
         db: Session = Depends(get_db)
     ):
+     
     stmt = select(Employee).\
-        join(Employee.position).\
-        join(Employee.rang).\
-        order_by(Employee.last_name, Employee.first_name)
+        order_by(
+                Employee.id, 
+                 Employee.last_name, 
+                 Employee.first_name,
+                 Employee.surname,
+                 Employee.birthday,
+                 Employee.position_id,
+                 Employee.rang_id,
+                 Employee.comment
+        )
     
     result = db.execute(stmt)
     employees = result.scalars().all()
+    print(employees)
     
-    return [EmployeeList.from_orm(employee) for employee in employees]
+    return employees 
+
 
 @router.delete("/{employee_id}", tags=["employee"])
 def delete_employee_route(

@@ -218,7 +218,7 @@ def create_employee(
     db_session.commit()
     return {
         "success": True,
-        "data": employee
+        "message": f"Created employee {employee.first_name} {employee.last_name} {employee.surname} on position {employee.position} with rang {employee.rang} and comment {employee.comment}" 
     }
 
 def create_position(
