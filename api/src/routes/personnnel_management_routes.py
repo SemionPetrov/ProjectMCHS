@@ -122,22 +122,6 @@ def delete_employee_route(
     return result
 
 
-@router.post("/positions/new", tags=["positions"])
-def add_position(
-        name: str,
-        group_position: str,
-        permission_checker: PermissionChecker = 
-        Depends(PermissionChecker(["personnel:write", "personnel:read"])),
-        db: Session = Depends(get_db)
-    ):
-
-    result = create_position(
-        db_session=db,
-        name=name,
-        group_position = group_position
-    )
-    return result    
-
 
 @router.put("/employees/{employee_id}", tags=["employee"])
 def update_employee_route(
@@ -154,6 +138,22 @@ def update_employee_route(
     )
     
     return result
+
+@router.post("/positions/new", tags=["positions"])
+def add_position(
+        name: str,
+        group_position: str,
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker(["personnel:write", "personnel:read"])),
+        db: Session = Depends(get_db)
+    ):
+
+    result = create_position(
+        db_session=db,
+        name=name,
+        group_position = group_position
+    )
+    return result    
 
 
 @router.put("/positions/{position_id}", tags=["positions"])

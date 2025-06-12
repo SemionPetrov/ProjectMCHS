@@ -124,3 +124,26 @@ def update_rang(
         "message": f"Successfully updated rang {rang.name}",
         "data": rang
     }
+
+
+def update_attestation_type(
+    db_session: Session,
+    attestation_type_id: int,
+    new_name: str,
+):
+    attestation_type= db_session.query(AttestationType).filter(AttestationType.id == attestation_type_id).first()
+    
+    if not attestation_type:
+        return {
+            "success": False,
+            "error": f"AttestationType with id {attestation_type_id} does not exist"
+        }
+    
+    attestation_type.name = new_name
+    
+    
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Successfully updated attestation {attestation_type.name} with id {attestation_type_id}",
+    }

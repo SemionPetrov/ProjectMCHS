@@ -62,6 +62,7 @@ def grant_privilege_by_ids(
         }
     
     user.privileges.append(privilege)
+    db_session.flush()
     db_session.commit()
     return {
         "success": True,
@@ -392,16 +393,17 @@ def create_attestation_type(
     
     if attestation_type:
         return {
-            "success": True,
-            "data": attestation_type
+            "success": False,
+            "message": f"Attestation type {name} already exists with id {attestation_type.id}!"
         }
     
     attestation_type = AttestationType(
         name=name
     )
     db_session.add(attestation_type)
+    db_session.commit()
     db_session.flush()
     return {
         "success": True,
-        "data": attestation_type
+        "message": f"Added attestation type {name} with id {attestation_type.id}!"
     }

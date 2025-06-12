@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, session
 from sqlalchemy import delete
 from database.db_models import *
 from config.admin_user import admin_user_credentials
@@ -110,6 +110,26 @@ def delete_rang(
         return {
                 "Success" : True,
                 "message" : f"Deleted rang {rang_id}"
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+        return {
+                "Success" : False,
+                "message" : f"{e}"
+                }
+def delete_attestation_tpye(
+    db_session:Session,
+    attestation_type_id: int
+):
+    try:
+        stmt = delete(AttestationType).where(AttestationType.id == attestation_type_id)
+        db_session.execute(stmt)
+        db_session.commit()
+        
+        return {
+                "Success" : True,
+                "message" : f"Deleted attestation type with id {attestation_type_id}"
                 }
     
     except Exception as e:
