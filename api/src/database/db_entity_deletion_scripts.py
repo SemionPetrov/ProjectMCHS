@@ -1,10 +1,7 @@
+from sqlalchemy.orm import Session
+from sqlalchemy import delete
 from database.db_models import *
-import bcrypt
-from datetime import datetime
-from config.db_timezone import prefered_timezone
 from config.admin_user import admin_user_credentials
-from typing import List, Optional
-from sqlalchemy import DateTime, Enum
 
 """
 Collection of scripts to create entities in database.
@@ -12,7 +9,7 @@ Used for fixtures and by api.
 """
 
 def revoke_privilege_by_ids(
-    db_session,
+    db_session: Session,
     user_id: int,
     privilege_id: int 
 ):
@@ -56,3 +53,68 @@ def revoke_privilege_by_ids(
         "success": True,
         "data": privilege_id
     }
+
+def delete_employee(db: Session, employee_id: int):
+    try:
+        stmt = delete(Employee).where(Employee.id == employee_id)
+        db.execute(stmt)
+        
+        db.commit()
+        
+        return {
+            "success": True,
+            "message": f'Deleted employee {employee_id}'
+        }
+    
+    except Exception as e:
+        db.rollback()
+        return {
+            "success": False,
+            "error": f"{e}"
+        }
+
+def delete_position(
+    db_session,
+    position_id: int
+):
+    try:
+        stmt = delete(Position).where(Position.id == position_id)
+        db_session.execute(stmt)
+        
+        db_session.commit()
+        
+        return {
+                "Success" : True,
+                "message" : f"Deleted position {position_id}"
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+
+        return {
+                "Success" : False,
+                "message" : f"{e}"
+                }
+
+def delete_rang(
+    db_session,
+    rang_id: int
+):
+    try:
+        # Delete the rang
+        stmt = delete(Rang).where(Rang.id == rang_id)
+        db_session.execute(stmt)
+        
+        db_session.commit()
+        
+        return {
+                "Success" : True,
+                "message" : f"Deleted rang {rang_id}"
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+        return {
+                "Success" : False,
+                "message" : f"{e}"
+                }

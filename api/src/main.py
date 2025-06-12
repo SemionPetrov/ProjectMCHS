@@ -23,6 +23,11 @@ api_router.include_router(personnnel_management_routes.router)
 # prefix api with /api 
 app.include_router(api_router)
 
+# add privileges to db
+from database.fixtures.privilege_fixtures import setup_privileges
+setup_privileges()
+
 # add fixtures to db
 from database.fixtures.admin_fixture import setup_admin_fixture
 setup_admin_fixture()
+

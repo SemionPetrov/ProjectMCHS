@@ -159,10 +159,6 @@ class Rang(Base):
         String(50), 
         nullable=False
     )
-    preparatory_period = Column(
-        Time, 
-        nullable=False
-    )
     
     # Relationship
     employees = relationship(

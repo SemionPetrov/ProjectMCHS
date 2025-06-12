@@ -21,6 +21,29 @@ def setup_admin_fixture():
                 admin_user_credentials.ADMIN_USERNAME,
                 admin_user_credentials.ADMIN_PRIVILEGE_NAME
         )
+
+
+        grant_privilege_by_names(
+                db,
+                admin_user_credentials.ADMIN_USERNAME,
+                "db query"
+        )
+        grant_privilege_by_names(
+                db,
+                admin_user_credentials.ADMIN_USERNAME,
+                "privilege:write"
+        )
+        grant_privilege_by_names(
+                db,
+                admin_user_credentials.ADMIN_USERNAME,
+                "privilege:read"
+        )
+
+        grant_privilege_by_names(
+                db,
+                admin_user_credentials.ADMIN_USERNAME,
+                "backend info:read"
+        )
     except Exception as e:
         db.rollback()
         raise e

@@ -116,8 +116,8 @@ def create_user(
     
     if user:
         return {
-            "success": True,
-            "data": user
+            "success": False,
+            "error": "User already exists!"
         }
     
     password_hash = bcrypt.hashpw(
@@ -160,6 +160,129 @@ def create_user_with_privileges(
             "success": False,
             "error": str(e)
         }
+
+
+def create_employee(
+    db_session,
+    last_name: str,
+    first_name: str,
+    surname: Optional[str],
+    birthday: Optional[Date],
+    position_id: int,
+    rang_id: int,
+    comment: Optional[str]
+):
+    position = db_session.query(Position).filter(
+        Position.id == position_id
+    ).first()
+    
+    if not position:
+        return {
+            "success": False,
+            "error": f"Position with id {position_id} does not exist"
+        }
+    
+    rang = db_session.query(Rang).filter(
+        Rang.id == rang_id
+    ).first()
+    
+    if not rang:
+        return {
+            "success": False,
+            "error": f"Rang with id {rang_id} does not exist"
+        }
+    
+    existing_employee = db_session.query(Employee).filter(
+        Employee.last_name == last_name,
+        Employee.first_name == first_name,
+        Employee.surname == surname
+    ).first()
+    
+    if existing_employee:
+        return {
+            "success": False,
+            "error": f"Employee with name {last_name} {first_name} {surname} already exists"
+        }
+    
+    employee = Employee(
+        last_name=last_name,
+        first_name=first_name,
+        surname=surname,
+        birthday=birthday,
+        position_id=position_id,
+        rang_id=rang_id,
+        comment=comment
+    )
+    db_session.add(employee)
+    db_session.flush()
+    db_session.commit()
+    return {
+        "success": True,
+        "data": employee
+    }
+
+def create_position(
+    db_session,
+    name: str,
+    group_position: str
+):
+    existing_position = db_session.query(Position).filter(
+        Position.name == name
+    ).first()
+    
+    if existing_position:
+        return {
+            "success": False,
+            "error": f"Position with name '{name}' already exists"
+        }
+    
+    valid_groups = ['среднего и старшего начальствующего состава',
+                    'рядового и младшего начальствующего состава',
+                    'работников']
+    
+    if group_position not in valid_groups:
+        return {
+            "success": False,
+            "error": f"Invalid group position. Must be one of: {', '.join(valid_groups)}"
+        }
+    
+    position = Position(
+        name=name,
+        group_position=group_position
+    )
+    db_session.add(position)
+    db_session.flush()
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Added position {position.name}!" 
+    }
+
+def create_rang(
+    db_session,
+    name: str,
+):
+    existing_rang = db_session.query(Rang).filter(
+        Rang.name == name
+    ).first()
+    
+    if existing_rang:
+        return {
+            "success": False,
+            "error": f"Rang with name '{name}' already exists"
+        }
+    
+    rang = Rang(
+        name=name,
+    )
+    db_session.add(rang)
+    db_session.flush()
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Added rang {rang.name}"
+    }
+
 
 def create_exercise(
     db_session,
@@ -234,84 +357,6 @@ def create_exercise_report(
         "data": exercise_report
     }
 
-def create_employee(
-    db_session,
-    last_name: str,
-    first_name: str,
-    surname: Optional[str],
-    birthday: Optional[Date],
-    position_id: int,
-    rang_id: int,
-    comment: Optional[str]
-):
-    employee = Employee(
-        last_name=last_name,
-        first_name=first_name,
-        surname=surname,
-        birthday=birthday,
-        position_id=position_id,
-        rang_id=rang_id,
-        comment=comment
-    )
-    db_session.add(employee)
-    db_session.flush()
-    return {
-        "success": True,
-        "data": employee
-    }
-
-
-def create_position(
-    db_session,
-    name: str,
-    group_position: str
-):
-    position = db_session.query(Position).filter(
-        Position.name == name
-    ).first()
-    
-    if position:
-        return {
-            "success": True,
-            "data": position
-        }
-    
-    position = Position(
-        name=name,
-        group_position=group_position
-    )
-    db_session.add(position)
-    db_session.flush()
-    return {
-        "success": True,
-        "data": position
-    }
-
-def create_rang(
-    db_session,
-    name: str,
-    preparatory_period: Time
-):
-    rang = db_session.query(Rang).filter(
-        Rang.name == name
-    ).first()
-    
-    if rang:
-        return {
-            "success": True,
-            "data": rang
-        }
-    
-    rang = Rang(
-        name=name,
-        preparatory_period=preparatory_period
-    )
-    db_session.add(rang)
-    db_session.flush()
-    return {
-        "success": True,
-        "data": rang
-    }
 
 def create_attestation(
     db_session,

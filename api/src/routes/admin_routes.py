@@ -7,10 +7,12 @@ from authentication.auth import  PermissionChecker
 from config.admin_user import admin_user_credentials
 from database.db_connector import get_db
 
+
 router = APIRouter(
         prefix="/admin",
         tags=["admin"]
         )
+
 
 @router.get("/dashboard")
 def admin_dashboard(
@@ -67,6 +69,7 @@ def admin_list_privileges(
         })
     return privileges_list
 
+
 @router.get("/list_privileges/{user_id}")
 def admin_user_list_privileges(
         user_id: str,
@@ -90,8 +93,6 @@ def admin_user_list_privileges(
     result = db.execute(stmt)
     rows = result.all()
 
-    print(rows) 
-
     privileges_list = []
     for row in rows:
         privileges_list.append({
@@ -101,6 +102,7 @@ def admin_user_list_privileges(
             'privilege_name': row.privilege_name
         })
     return privileges_list
+
 
 @router.get("/privileges/all")
 def get_all_privileges(
@@ -123,6 +125,7 @@ def get_all_privileges(
         })
     
     return privileges_list
+
 
 @router.delete("/privileges/{user_id}/{privilege_id}")
 def admin_delete_privilege(

@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends, status
+from sqlalchemy import Null
 from sqlalchemy.orm import Session
 import jwt
-
-from authentication.auth import oauth2_scheme, get_payload_secret_key, get_user_by_login
-from database.db_connector import get_db
 from models.pydantic_models import  UserPrivilegesResponse
-from authentication.auth import PermissionChecker
+
+from authentication.auth import PermissionChecker, get_user_by_login 
+from authentication.auth import get_user_from_token, oauth2_scheme, get_payload_secret_key, get_user_by_login
+from database.db_connector import get_db
+from database.db_entity_selection_scripts import get_user_privs_with_ids
 
 router = APIRouter(
         prefix="/user",
@@ -21,12 +23,21 @@ def get_user_attestations(
     return {"Not implimented"}
 
 
-# TODO make model for that
 @router.put("/change_personal_data")
 def change_personal_data(
         permission_checker: PermissionChecker = 
-            Depends(PermissionChecker([None]))
+            Depends(PermissionChecker([None])),
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme)
     ):
+    
+    user = get_user_from_token(token, db)
+    
+    #if user.employee_id:
+        #return {
+                #"message" : "Need to be employee_id to have personal data!"
+                #}
+
     return {"Not implimented"}
 
 
@@ -39,43 +50,12 @@ def pending_exercises(
 
 
 @router.get("/privileges", response_model=UserPrivilegesResponse)
-def get_user_privileges(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    # Extract username from token
-    try:
-        payload = jwt.decode(token, get_payload_secret_key(), algorithms=["HS256"])
-        username = payload.get("sub")
-        
-        if not username:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token"
-            )
-            
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired"
-        )
-    except jwt.DecodeError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
-        )
+def get_user_privileges(
+        token: str = Depends(oauth2_scheme), 
+        db: Session = Depends(get_db)
+        ):
+    user = get_user_from_token(token, db)
+    
+    privileges = [i["privilege_name"] for i in get_user_privs_with_ids(user, db)]
 
-    # Get user and their privileges
-    user = get_user_by_login(username, db)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-
-    # Get privileges from either token or database
-    privileges_from_token = payload.get("permissions", [])
-    if privileges_from_token:
-        privileges = privileges_from_token
-    else:
-        privileges = [privilege.name for privilege in get_user_privileges(db, user.id)]
-
-    return UserPrivilegesResponse(privileges=privileges)
-
+    return UserPrivilegesResponse(privileges=privileges) 

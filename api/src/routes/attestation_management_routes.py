@@ -39,7 +39,7 @@ def delete_attestation_tpye(
     ):
     return {"message" : f"Deleted attestation type {attestation_type_id}"}
 
-# TODO make model for that
+
 @router.post("/add_attestation", tags=["attestation"])
 def add_attestation(
         emplyee_list: List[str],
@@ -84,7 +84,6 @@ def get_pending_attestations(
     return {"Not implimented"}
 
 
-# TODO make model for that
 @router.post("/plan_attestation", tags=["planned attestation"])
 def plan_attestation(
         permission_checker: PermissionChecker = 
