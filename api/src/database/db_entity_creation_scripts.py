@@ -68,7 +68,7 @@ def grant_privilege_by_ids(
     db_session.commit()
     return {
         "success": True,
-        "data": privilege
+        "message": f"Granted user {user.login} id {user_id} privilege {privilege.name} with id {privilege.id}" 
     }
 
 def grant_privilege_by_names(
