@@ -13,7 +13,7 @@ def update_employee(
     last_name: Optional[str] = None,
     first_name: Optional[str] = None,
     surname: Optional[str] = None,
-    birthday: Optional[datetime] = None,
+    birthday: Optional[Date] = None,
     position_id: Optional[int] = None,
     rang_id: Optional[int] = None,
     comment: Optional[str] = None

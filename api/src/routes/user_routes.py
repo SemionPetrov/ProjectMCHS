@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException, Depends, status
-from sqlalchemy import Null
+from fastapi import APIRouter, Depends
+from sqlalchemy import select, Date
 from sqlalchemy.orm import Session
-import jwt
 from models.pydantic_models import  UserPrivilegesResponse
+from typing import Optional, cast
 
-from authentication.auth import PermissionChecker, get_user_by_login 
-from authentication.auth import get_user_from_token, oauth2_scheme, get_payload_secret_key, get_user_by_login
+from authentication.auth import get_user_from_token, oauth2_scheme, PermissionChecker
 from database.db_connector import get_db
 from database.db_entity_selection_scripts import get_user_privs_with_ids
+from database.db_entity_updation_scripts import update_employee 
+from database.db_models import PendingExercise
 
 router = APIRouter(
         prefix="/user",
@@ -25,6 +26,13 @@ def get_user_attestations(
 
 @router.put("/change_personal_data")
 def change_personal_data(
+        last_name: Optional[str] = None,
+        first_name: Optional[str] = None,
+        surname: Optional[str] = None,
+        birthday: Optional[str] = None,
+        position_id: Optional[int] = None,
+        rang_id: Optional[int] = None,
+        comment: Optional[str] = None,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker([None])),
         db: Session = Depends(get_db),
@@ -32,21 +40,52 @@ def change_personal_data(
     ):
     
     user = get_user_from_token(token, db)
-    
-    #if user.employee_id:
-        #return {
-                #"message" : "Need to be employee_id to have personal data!"
-                #}
+    if user.employee_id is None:
+        return {
+                "success": False,
+                "message": "User has no employee_id!"
+                }
+    result = update_employee(
+            db,
+            user.employee_id,
+            last_name,
+            first_name,
+            surname,
+            cast(Date,birthday),
+            position_id,
+            rang_id,
+            comment
+            ) 
 
-    return {"Not implimented"}
+    return result
 
 
-@router.get("/pending_exercises")
+@router.get("/exercises")
 def pending_exercises(
+        token: str = Depends(oauth2_scheme), 
         permission_checker: PermissionChecker = 
-            Depends(PermissionChecker([None]))
+            Depends(PermissionChecker([None])),
+        db: Session = Depends(get_db)
     ):
-    return {"Not implimented"}
+    user = get_user_from_token(token, db)
+
+    if user.employee_id is None:
+        return {
+                "success": False,
+                "message": "User has no employee_id!"
+                }
+
+    stmt = select(PendingExercise.employee_id).\
+        where(PendingExercise.employee_id== user.employee_id).\
+        order_by(
+                PendingExercise.id,
+                PendingExercise.employee_id,
+        )
+    
+    result = db.execute(stmt)
+    exercises= result.scalars().all()
+    
+    return exercises
 
 
 @router.get("/privileges", response_model=UserPrivilegesResponse)
