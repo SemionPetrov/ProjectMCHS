@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from authentication.auth import  PermissionChecker
 from config.admin_user import admin_user_credentials
 from database.db_connector import get_db
+from database.db_models import User
 
 
 router = APIRouter(
@@ -34,6 +35,19 @@ def admin_dashboard(
         "db status" : "connected" if db else "disconnected",
         "user accounts" : db.query(User).count()
         }
+
+
+@router.get("/users")
+def admin_list_users(
+        permission_checker: PermissionChecker = 
+            Depends(PermissionChecker(
+                ["privilege:read"])),
+        db: Session = Depends(get_db)
+    ):
+    users_query = db.query(User)
+    users = users_query.all()
+    return users
+
 
 
 @router.get("/list_privileges")
