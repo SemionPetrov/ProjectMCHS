@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, Date
 from sqlalchemy.orm import Session
-from typing import List, cast
+from typing import List, cast, Optional
 
 from database.db_connector import get_db
 from database.db_entity_creation_scripts import create_attestation, create_attestation_type
@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.post("/add/{attestation_type_name}", tags=["attestation type"])
-def add_attestation_tpye_route(
+def add_attestation_type_route(
         attestation_type_name: str,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(["attestation:read","attestation:write" ])),
@@ -28,7 +28,7 @@ def add_attestation_tpye_route(
 
 
 @router.delete("/delete/{attestation_type_id}", tags=["attestation type"])
-def delete_attestation_tpye_route(
+def delete_attestation_type_route(
         attestation_type_id: int,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(["attestation:read","attestation:write"])),
@@ -71,7 +71,7 @@ def add_attestation(
         type_id: int,
         status: int,
         date: str,
-        examination_date: str,
+        examination_date: Optional[str] = None,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(["attestation:read", "attestation:write"])),
         db: Session = Depends(get_db)
@@ -114,10 +114,10 @@ def delete_attestation_route(
 def change_attestation(
         attestation_id: int,
         emplyee_id: int,
-        type_id: int,
-        status: int,
-        date: str,
-        examination_date: str,
+        type_id: Optional[int] = None,
+        status: Optional[int] = None,
+        date: Optional[str] = None,
+        examination_date: Optional[str] = None,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(["attestation:read", "attestation:write"])),
         db: Session = Depends(get_db)

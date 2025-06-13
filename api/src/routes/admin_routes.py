@@ -18,7 +18,7 @@ router = APIRouter(
 def admin_dashboard(
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(
-                [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
+                ["backend info:read"])),
             db: Session = Depends(get_db)
     ):
 
@@ -39,8 +39,8 @@ def admin_dashboard(
 @router.get("/list_privileges")
 def admin_list_privileges(
         permission_checker: PermissionChecker = 
-        Depends(PermissionChecker(
-            [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
+            Depends(PermissionChecker(
+                ["privilege:read"])),
         db: Session = Depends(get_db)
     ):
 
@@ -109,7 +109,7 @@ def get_all_privileges(
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
-            [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
+            ["privilege:read"])),
     ):
 
     from database.db_models import Privilege
@@ -133,7 +133,7 @@ def admin_delete_privilege(
         privilege_id: int,
         permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
-            [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
+            ["privilege:read","privilege:read"])),
         db: Session = Depends(get_db)
     ):
     from database.db_entity_deletion_scripts import revoke_privilege_by_ids
@@ -157,7 +157,7 @@ def create_privilege(
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
-            [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
+            ["privilege:read","privilege:read"])),
 ):
     from database.db_entity_creation_scripts import create_privilege
     result = create_privilege(db, privilege_name)
@@ -181,7 +181,7 @@ def admin_grant_privilege(
         privilege_id: int,
         permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
-            [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
+            ["privilege:read","privilege:read"])),
         db: Session = Depends(get_db)
     ):
     from database.db_entity_creation_scripts import grant_privilege_by_ids
@@ -196,7 +196,7 @@ def execute_query(
         query:str, 
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(
-                [admin_user_credentials.ADMIN_PRIVILEGE_NAME]))
+                ["db query"]))
     ):
 
     from sqlalchemy import text

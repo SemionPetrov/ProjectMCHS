@@ -159,8 +159,8 @@ def add_position(
 @router.put("/positions/{position_id}", tags=["positions"])
 def update_position_route(
     position_id: int,
-    new_name: str,
-    group_position: str | None,
+    new_name: Optional[str] = None,
+    group_position: Optional[str] = None,
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
@@ -210,6 +210,7 @@ def create_rang_route(
     )
     return result    
 
+
 @router.get("/rangs", tags=["rangs"])
 def get_rangs_list(
     db: Session = Depends(get_db),
@@ -223,6 +224,7 @@ def get_rangs_list(
     positions = result.scalars().all()
     
     return positions 
+
 
 @router.put("/rangs/{rang_id}", tags=["rangs"])
 def update_rang_route(

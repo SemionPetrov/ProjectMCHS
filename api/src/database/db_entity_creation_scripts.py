@@ -5,6 +5,7 @@ from datetime import datetime
 from config.db_timezone import prefered_timezone
 from typing import List, Optional
 from sqlalchemy import DateTime, Enum
+from sqlalchemy.orm import Session
 
 """
 Collection of scripts to create entities in database.
@@ -12,9 +13,10 @@ Used for fixtures and by api.
 """
 
 def create_privilege(
-    db_session, 
+    db_session: Session, 
     privilege_name: str
-):
+    ):
+
     privilege = db_session.query(Privilege).filter(
         Privilege.name == privilege_name
     ).first()
@@ -36,10 +38,10 @@ def create_privilege(
 
 
 def grant_privilege_by_ids(
-    db_session, 
+    db_session: Session, 
     user_id: int, 
     privilege_id: int 
-):
+    ):
     user = db_session.query(User).filter(User.id == user_id).first()
     
     if not user:
@@ -70,7 +72,7 @@ def grant_privilege_by_ids(
     }
 
 def grant_privilege_by_names(
-    db_session, 
+    db_session: Session, 
     user_login: str, 
     privilege_name: str
     ):
@@ -103,14 +105,21 @@ def grant_privilege_by_names(
         "data": privilege
     }
 
-
 def create_user(
-    db_session, 
+    db_session: Session, 
     user_login: str, 
     password: str, 
-    employee_id: int|None = None, 
-    contact_info: str|None = None
+    employee_id: Optional[int] = None, 
+    contact_info: Optional[str] = None
 ):
+    # Validate required parameters
+    if not user_login or not password:
+        return {
+            "success": False,
+            "error": "User login and password are required!"
+        }
+    
+    # Check if user exists
     user = db_session.query(User).filter(
         User.login == user_login
     ).first()
@@ -121,16 +130,34 @@ def create_user(
             "error": "User already exists!"
         }
     
+    # Validate employee_id if provided
+    if employee_id is not None:
+        if not isinstance(employee_id, int):
+            return {
+                "success": False,
+                "error": "Employee ID must be an integer!"
+            }
+    
+    # Validate contact_info if provided
+    if contact_info is not None:
+        if not isinstance(contact_info, str):
+            return {
+                "success": False,
+                "error": "Contact info must be a string!"
+            }
+    
+    # Hash password
     password_hash = bcrypt.hashpw(
         password.encode(),
         bcrypt.gensalt()
     ).decode()
     
+    # Create user with proper typing
     user = User(
         login=user_login,
         password_hash=password_hash,
         employee_id=employee_id,
-        contact_info = contact_info,
+        contact_info=contact_info,
         created=datetime.now(prefered_timezone),
         updated_at=datetime.now(prefered_timezone)
     )
@@ -144,27 +171,9 @@ def create_user(
         "data": user
     }
 
-def create_user_with_privileges(
-    db_session,
-    user_login: str,
-    password: str,
-    privilege_names: List[str]
-):
-    try:
-        user = create_user(db_session, user_login, password)
-        for privilege_name in privilege_names:
-            grant_privilege_by_names(db_session, user_login, privilege_name)
-        return user
-    except Exception as e:
-        db_session.rollback()
-        return {
-            "success": False,
-            "error": str(e)
-        }
-
 
 def create_employee(
-    db_session,
+    db_session: Session,
     last_name: str,
     first_name: str,
     surname: Optional[str],
@@ -223,7 +232,7 @@ def create_employee(
     }
 
 def create_position(
-    db_session,
+    db_session: Session,
     name: str,
     group_position: str
 ):
@@ -260,7 +269,7 @@ def create_position(
     }
 
 def create_exercise_type(
-    db_session,
+    db_session: Session,
     name: str
 ):
     exercise_type = db_session.query(ExerciseType).filter(
@@ -287,7 +296,7 @@ def create_exercise_type(
 
 
 def create_rang(
-    db_session,
+    db_session: Session,
     name: str,
 ):
     existing_rang = db_session.query(Rang).filter(
@@ -313,13 +322,14 @@ def create_rang(
 
 
 def create_exercise(
-    db_session,
+    db_session: Session,
     employee_id:int,
     exercise_type_id: int,
     date: DateTime,
     address: str,
-    comment: str
-):
+    comment: Optional[str] = None
+    ):
+
     exercise = db_session.query(PendingExercise).filter(
         PendingExercise.date == date,
         PendingExercise.address == address,
@@ -348,14 +358,14 @@ def create_exercise(
     }
 
 def create_exercise_report(
-    db_session,
+    db_session: Session,
     exercise_id:int,
     start_date: DateTime,
     finish_date: DateTime,
     count_plan: int,
     count_actual: int,
     count_reason: str,
-    comment: str
+    comment: Optional[str] = None,
 ):
 
     exercise = db_session.query(PendingExercise).filter(
@@ -410,7 +420,7 @@ def create_exercise_report(
 
 
 def create_attestation(
-    db_session,
+    db_session: Session,
     employee_id: int,
     type_id: int,
     status: int,
@@ -464,7 +474,7 @@ def create_attestation(
     }
 
 def create_attestation_type(
-    db_session,
+    db_session: Session,
     name: str
 ):
     attestation_type = db_session.query(AttestationType).filter(

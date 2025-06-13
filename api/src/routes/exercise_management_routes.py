@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, DateTime
 from typing import cast, Optional
 
+from sqlalchemy.orm.attributes import OP_APPEND
+
 from database.db_connector import get_db
 from database.db_entity_creation_scripts import create_exercise_report, create_exercise_type, create_exercise
 from database.db_entity_deletion_scripts import delete_exercise_report, delete_exercise_type, delete_exercise
@@ -73,7 +75,7 @@ def add_exercise_report_route(
         count_plan: int,
         count_actual: int,
         count_reason: str,
-        comment: str,
+        comment: Optional[str] = None,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
@@ -127,12 +129,12 @@ def delete_exercise_report_route(
 @router.put("/reports/change{report_id}", tags=["exercise report"])
 def update_exercise_report_route(
         report_id: int,
-        new_start_date: str,
-        new_finish_date: str,
-        new_count_plan: int,
-        new_count_actual: int,
-        new_count_reason: str,
-        new_comment: str,
+        new_start_date: Optional[str] = None,
+        new_finish_date: Optional[str] = None,
+        new_count_plan: Optional[int] = None,
+        new_count_actual: Optional[int] = None,
+        new_count_reason: Optional[str] = None,
+        new_comment: Optional[str] = None,
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
@@ -156,7 +158,7 @@ def add_exercise(
     exercise_type_id: int,
     date: str,
     address: str,
-    comment: str,
+    comment: Optional[str] = None,
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["exercise:read", "exercise:write"])),
     db: Session = Depends(get_db)
@@ -176,10 +178,10 @@ def add_exercise(
 def update_exercise_route(
     exercise_id: int,
     employee_id: int,
-    exercise_type_id: int,
-    date: str,
-    address: str,
-    comment: str,
+    exercise_type_id: Optional[int] = None,
+    date: Optional[str] = None,
+    address: Optional[str] = None,
+    comment: Optional[str] = None,
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["exercise:read", "exercise:write"])),
     db: Session = Depends(get_db)
@@ -189,7 +191,7 @@ def update_exercise_route(
         exercise_id,
         employee_id,
         exercise_type_id,
-        cast(DateTime, date),
+        cast(DateTime, date) if date is not None else None,
         address,
         comment
     )
