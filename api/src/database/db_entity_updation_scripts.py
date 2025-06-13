@@ -1,14 +1,10 @@
-from pydantic import networks
 from sqlalchemy.orm import Session
-from sqlalchemy import delete
-from database import db_entity_creation_scripts
 from database.db_models import *
-from config.admin_user import admin_user_credentials
 from typing import Optional
 from datetime import datetime
 
 """
-Collection of scripts to create entities in database.
+Collection of scripts to uupdate entities in database.
 Used for fixtures and by api. 
 """
 def update_employee(
@@ -66,7 +62,7 @@ def update_employee(
     
     return {
         "success": True,
-        "data": employee
+        "message": f"Updated employee {employee_id}" 
     }
 
 def update_position(
@@ -101,32 +97,7 @@ def update_position(
     return {
         "success": True,
         "message": f"Successfully updated position {position.name}",
-        "data": position
     }
-
-def update_rang(
-    db_session: Session,
-    rang_id: int,
-    name: str,
-):
-    rang = db_session.query(Rang).filter(Rang.id == rang_id).first()
-    
-    if not rang:
-        return {
-            "success": False,
-            "error": f"Rang with id {rang_id} does not exist"
-        }
-    
-    rang.name = name
-    
-    
-    db_session.commit()
-    return {
-        "success": True,
-        "message": f"Successfully updated rang {rang.name}",
-        "data": rang
-    }
-
 
 def update_attestation_type(
     db_session: Session,
@@ -181,7 +152,9 @@ def update_attestation(
         "success": True,
         "message": f"Successfully updated attestation {attestation.id} for employee {emplyee_id} with",
     }
-def update_exercise_type(
+
+
+def update_rang(
     db_session: Session,
     rang_id: int,
     name: str,
@@ -201,7 +174,6 @@ def update_exercise_type(
     return {
         "success": True,
         "message": f"Successfully updated rang {rang.name}",
-        "data": rang
     }
 
 def update_exercise_type(
@@ -227,4 +199,103 @@ def update_exercise_type(
         "message": f"Successfully updated exercise_type {exercise_type.id} to name {exercise_type.name}",
     }
 
+def update_exercise_report(
+    db_session,
+    exercise_report_id: int,
+    new_start_date: DateTime,
+    new_finish_date: DateTime,
+    new_count_plan: int,
+    new_count_actual: int,
+    new_count_reason: str,
+    new_comment: str
+):
 
+    exercise_report = db_session.query(ExerciseReport).filter(
+        ExerciseReport.id == exercise_report_id,
+    ).first()
+    
+    if not exercise_report:
+        return {
+            "success": False,
+            "error": f"ExerciseReport does not exists!"
+        }
+
+    valid_count_reason =  [
+            'Отсутствие ХП-И', 
+            'Отсутствие кислорода', 
+            'Отсутствие воздуха', 
+            'Пожар', 
+            'Запрет выездов', 
+            'Прочее']
+
+    if new_count_reason not in valid_count_reason:
+        return {
+            "success": False,
+            "error": f" {'Count reason should be one of: '.join(valid_count_reason)}!"
+        }
+
+    exercise_report.start_date = new_start_date,
+    exercise_report.finish_date = new_finish_date,
+    exercise_report.count_plan = new_count_plan,
+    exercise_report.count_actual = new_count_actual,
+    exercise_report.count_reason = new_count_reason,
+    exercise_report.comment = new_comment
+    
+    db_session.flush()
+    db_session.commit()
+    return {
+        "success": True,
+        "message": f"Updated exercise report with id {exercise_report.id}!"
+    }
+
+def update_exercise(
+    db_session: Session,
+    employee_id: int,
+    exercise_id: int,
+    exercise_type_id: int,
+    date: DateTime,
+    address: str,
+    comment: str,
+):
+    exercise = db_session.query(PendingExercise).filter(PendingExercise.id == exercise_id).first()
+    
+    if not exercise:
+        return {
+            "success": False,
+            "error": f"Exercise with id {exercise_id} does not exist"
+        }
+    
+    # Update fields that were provided
+    if employee_id is not None:
+        # Check if employee exists
+        employee = db_session.query(Employee).filter(Employee.id == employee_id).first()
+        if not employee:
+            return {
+                "success": False,
+                "error": f"Employee with id {employee_id} does not exist"
+            }
+        exercise.employee_id = employee_id
+    
+    if exercise_type_id is not None:
+        exercise_type = db_session.query(ExerciseType).filter(ExerciseType.id == exercise_type_id).first()
+        if not exercise_type:
+            return {
+                "success": False,
+                "message": f"Exercise type with id {exercise_type_id} does not exist"
+            }
+
+    exercise.exercise_type_id = exercise_type_id
+
+    exercise.date = date
+    
+    exercise.address = address
+    
+    exercise.comment = comment
+    
+    # Commit changes
+    db_session.commit()
+    
+    return {
+        "success": True,
+        "message": f"Successfully updated exercise {exercise_id}",
+    }

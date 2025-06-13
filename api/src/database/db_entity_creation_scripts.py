@@ -314,7 +314,7 @@ def create_rang(
 
 def create_exercise(
     db_session,
-    employee_id: List[int],
+    employee_id:int,
     exercise_type_id: int,
     date: DateTime,
     address: str,
@@ -322,53 +322,76 @@ def create_exercise(
 ):
     exercise = db_session.query(PendingExercise).filter(
         PendingExercise.date == date,
-        PendingExercise.address == address
+        PendingExercise.address == address,
+        PendingExercise.employee_id == employee_id
     ).first()
     
     if exercise:
         return {
-            "success": True,
-            "data": exercise
+            "success": False,
+            "message": f"Exercise {exercise.id} already exists for employee {employee_id}!"
+
         }
     
-    for employee in employee_id:
-        exercise = PendingExercise(
-            employee_id=employee,
-            exercise_type_id=exercise_type_id,
-            date=date,
-            address=address,
-            comment=comment
-        )
-        db_session.add(exercise)
-    
+    exercise = PendingExercise(
+        employee_id=employee_id,
+        exercise_type_id=exercise_type_id,
+        date=date,
+        address=address,
+        comment=comment
+    ) 
+    db_session.add(exercise)
     db_session.commit()
     return {
         "success": True,
-        "data": exercise
+        "message": f"Added exercise {exercise.id} for employee {employee_id}!"
     }
 
 def create_exercise_report(
     db_session,
-    exercise_id: int,
+    exercise_id:int,
     start_date: DateTime,
     finish_date: DateTime,
     count_plan: int,
     count_actual: int,
-    count_reason: Enum,
+    count_reason: str,
     comment: str
 ):
+
+    exercise = db_session.query(PendingExercise).filter(
+        PendingExercise.id== exercise_id,
+    ).first()
+
+
+    if not exercise:
+        return {
+            "success": False,
+            "error": f"ExerciseReport could be only created for existing exercise, exercise {exercise_id} does not exists!"
+        }
+
     exercise_report = db_session.query(ExerciseReport).filter(
-        ExerciseReport.exercise_id == exercise_id
+        ExerciseReport.exercise_id== exercise_id,
     ).first()
     
     if exercise_report:
         return {
-            "success": True,
-            "data": exercise_report
+            "success": False,
+            "error": f"ExerciseReport already exists with id {exercise_report.id}!"
         }
-    
+    valid_count_reason =  [
+            'Отсутствие ХП-И', 
+            'Отсутствие кислорода', 
+            'Отсутствие воздуха', 
+            'Пожар', 
+            'Запрет выездов', 
+            'Прочее']
+
+    if count_reason not in valid_count_reason:
+        return {
+            "success": False,
+            "error": f" {'Count reason should be one of: '.join(valid_count_reason)}!"
+        }
     exercise_report = ExerciseReport(
-        exercise_id=exercise_id,
         start_date=start_date,
         finish_date=finish_date,
         count_plan=count_plan,
@@ -382,7 +405,7 @@ def create_exercise_report(
     db_session.commit()
     return {
         "success": True,
-        "data": exercise_report
+        "message": f"Created exercise report with id {exercise_report.id}!"
     }
 
 

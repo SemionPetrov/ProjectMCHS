@@ -4,8 +4,8 @@ from database.db_models import *
 from config.admin_user import admin_user_credentials
 
 """
-Collection of scripts to create entities in database.
-Used for fixtures and by api. 
+Collection of scripts to remove entities in database.
+Used by api. 
 """
 
 def revoke_privilege_by_ids(
@@ -187,3 +187,58 @@ def delete_exercise_type(
                 "Success" : False,
                 "message" : f"{e}"
                 }
+
+
+def delete_exercise_report(
+    db_session:Session,
+    exercise_report_id: int,
+):
+    try:
+        stmt = delete(ExerciseReport).where(
+                ExerciseReport.id ==exercise_report_id 
+        )
+        db_session.execute(stmt)
+        db_session.flush()
+        db_session.commit()
+        
+        return {
+                "Success" : True,
+                "message" : f"Deleted exercise report with id {exercise_report_id}!"
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+        return {
+                "Success" : False,
+                "message" : f"{e}"
+                }
+
+def delete_exercise(
+    db_session: Session,
+    exercise_id: int
+):
+    try:
+        exercise = db_session.query(PendingExercise).filter(PendingExercise.id == exercise_id).first()
+        
+        if not exercise:
+            return {
+                "success": False,
+                "error": f"Exercise with id {exercise_id} does not exist"
+            }
+            
+        stmt = delete(PendingExercise).where(PendingExercise.id == exercise_id)
+        db_session.execute(stmt)
+        
+        db_session.commit()
+        
+        return {
+            "success": True,
+            "message": f"Deleted exercise {exercise_id}"
+        }
+    
+    except Exception as e:
+        db_session.rollback()
+        return {
+            "success": False,
+            "error": f"{str(e)}"
+        }
