@@ -1,3 +1,5 @@
+from operator import pos
+from os import execle
 from starlette.requests import empty_receive
 from database.db_models import *
 import bcrypt
@@ -24,7 +26,8 @@ def create_privilege(
     if privilege:
         return {
             "success": False,
-            "error": f"Privilege {privilege_name} already exists"
+            "message": f"Privilege {privilege_name} already exists",
+            "privilege_id": privilege.id
         }
     
     privilege = Privilege(name=privilege_name)
@@ -33,7 +36,8 @@ def create_privilege(
     db_session.commit()
     return {
         "success": True,
-        "data": privilege
+        "message": f"Created privilege {privilege_name}!",
+        "id": privilege.id
     }
 
 
@@ -47,7 +51,7 @@ def grant_privilege_by_ids(
     if not user:
         return {
             "success": False,
-            "error": f"User with login {user.login} and id {user.id} does not exist"
+            "message": f"User with login {user.login} and id {user.id} does not exist",
         }
     
     privilege = db_session.query(Privilege).filter(Privilege.id == privilege_id).first()
@@ -55,20 +59,23 @@ def grant_privilege_by_ids(
     if not privilege:
         return {
             "success": False,
-            "error": f"{privilege.name} privilege not found!"
+            "message": f"{privilege.name} privilege not found!"
         }
     
     if privilege in user.privileges:
         return {
             "success": False,
-            "error": f"Privilege {privilege.name} already exists for user {user.login}"
+            "message": f"Privilege {privilege.name} already exists for user {user.login}",
+            "priv_id": privilege.id
         }
     
     user.privileges.append(privilege)
     db_session.commit()
     return {
         "success": True,
-        "message": f"Granted user {user.login} id {user_id} privilege {privilege.name} with id {privilege.id}" 
+        "message": f"Granted user {user.login} id {user_id} privilege {privilege.name} with id {privilege.id}" ,
+        "user_id": user.id,
+        "privilege_id": privilege_id
     }
 
 def grant_privilege_by_names(
@@ -81,7 +88,7 @@ def grant_privilege_by_names(
     if not user:
         return {
             "success": False,
-            "error": f"User with login {user_login} does not exist"
+            "message": f"User with login {user_login} does not exist"
         }
     
     privilege = db_session.query(Privilege).filter(Privilege.name == privilege_name).first()
@@ -89,20 +96,23 @@ def grant_privilege_by_names(
     if not privilege:
         return {
             "success": False,
-            "error": f"{privilege_name} privilege not found!"
+            "message": f"{privilege_name} privilege not found!"
         }
     
     if privilege in user.privileges:
         return {
             "success": False,
-            "error": f"Privilege {privilege_name} already exists for user {user_login}"
+            "message": f"Privilege {privilege_name} already exists for user {user_login}",
+            "priv_id":privilege.id
         }
     
     user.privileges.append(privilege)
     db_session.commit()
     return {
         "success": True,
-        "data": privilege
+        "message": f"Granted user {user.login} privilege {privilege.name}!",
+        "user_id": user.id,
+        "priv_id": privilege.id
     }
 
 def create_user(
@@ -116,7 +126,7 @@ def create_user(
     if not user_login or not password:
         return {
             "success": False,
-            "error": "User login and password are required!"
+            "message": "User login and password are required!"
         }
     
     # Check if user exists
@@ -125,26 +135,11 @@ def create_user(
     ).first()
     
     if user:
+        # exposing id seems like a bad idea
         return {
             "success": False,
-            "error": "User already exists!"
+            "message": "User already exists!"
         }
-    
-    # Validate employee_id if provided
-    if employee_id is not None:
-        if not isinstance(employee_id, int):
-            return {
-                "success": False,
-                "error": "Employee ID must be an integer!"
-            }
-    
-    # Validate contact_info if provided
-    if contact_info is not None:
-        if not isinstance(contact_info, str):
-            return {
-                "success": False,
-                "error": "Contact info must be a string!"
-            }
     
     # Hash password
     password_hash = bcrypt.hashpw(
@@ -168,7 +163,8 @@ def create_user(
     
     return {
         "success": True,
-        "data": user
+        "message": f"Created user {user.login}!",
+        "user_id": user.id
     }
 
 
@@ -189,7 +185,7 @@ def create_employee(
     if not position:
         return {
             "success": False,
-            "error": f"Position with id {position_id} does not exist"
+            "message": f"Position with id {position_id} does not exist"
         }
     
     rang = db_session.query(Rang).filter(
@@ -199,7 +195,7 @@ def create_employee(
     if not rang:
         return {
             "success": False,
-            "error": f"Rang with id {rang_id} does not exist"
+            "message": f"Rang with id {rang_id} does not exist"
         }
     
     existing_employee = db_session.query(Employee).filter(
@@ -211,7 +207,8 @@ def create_employee(
     if existing_employee:
         return {
             "success": False,
-            "error": f"Employee with name {last_name} {first_name} {surname} already exists"
+            "message": f"Employee with name {last_name} {first_name} {surname} already exists",
+            "employee_id": existing_employee.id
         }
     
     employee = Employee(
@@ -228,7 +225,8 @@ def create_employee(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Created employee {employee.first_name} {employee.last_name} {employee.surname} on position {employee.position} with rang {employee.rang} and comment {employee.comment}" 
+        "message": f"Created employee {employee.first_name} {employee.last_name} {employee.surname} on position {employee.position} with rang {employee.rang} and comment {employee.comment}",
+        "employee_id": employee.id
     }
 
 def create_position(
@@ -243,7 +241,9 @@ def create_position(
     if existing_position:
         return {
             "success": False,
-            "error": f"Position with name '{name}' already exists"
+            "message": f"Position with name '{name}' already exists",
+            "position_id":existing_position.id
+
         }
     
     valid_groups = ['среднего и старшего начальствующего состава',
@@ -253,7 +253,7 @@ def create_position(
     if group_position not in valid_groups:
         return {
             "success": False,
-            "error": f"Invalid group position. Must be one of: {', '.join(valid_groups)}"
+            "message": f"Invalid group position. Must be one of: {', '.join(valid_groups)}"
         }
     
     position = Position(
@@ -265,7 +265,8 @@ def create_position(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Added position {position.name}!" 
+        "message": f"Added position {position.name}!",
+        "position_id":position.id
     }
 
 def create_exercise_type(
@@ -279,7 +280,8 @@ def create_exercise_type(
     if exercise_type:
         return {
             "success": False,
-            "error": f"ExerciseType with name {name} already exist with id {exercise_type.id}!"
+            "message": f"ExerciseType with name {name} already exist with id {exercise_type.id}!",
+            "exercise_type_id":exercise_type.id
         }
     
     exercise_type = ExerciseType(
@@ -291,7 +293,8 @@ def create_exercise_type(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Created exercise_type {exercise_type.name} with id {exercise_type.id}" 
+        "message": f"Created exercise_type {exercise_type.name} with id {exercise_type.id}",
+        "exercise_type_id":exercise_type.id
     }
 
 
@@ -306,7 +309,8 @@ def create_rang(
     if existing_rang:
         return {
             "success": False,
-            "error": f"Rang with name '{name}' already exists"
+            "message": f"Rang with name '{name}' already exists",
+            "rang_id":existing_rang.id
         }
     
     rang = Rang(
@@ -317,7 +321,8 @@ def create_rang(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Added rang {rang.name}"
+        "message": f"Added rang {rang.name}!",
+        "rang_id":rang.id
     }
 
 
@@ -339,7 +344,9 @@ def create_exercise(
     if exercise:
         return {
             "success": False,
-            "message": f"Exercise {exercise.id} already exists for employee {employee_id}!"
+            "message": f"Exercise {exercise.id} already exists for employee {employee_id}!",
+            "exercise_id": exercise.id,
+            "employee_id":employee_id
 
         }
     
@@ -354,7 +361,8 @@ def create_exercise(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Added exercise {exercise.id} for employee {employee_id}!"
+        "message": f"Added exercise {exercise.id} for employee {employee_id}!",
+        "exercise_id":exercise.id
     }
 
 def create_exercise_report(
@@ -376,7 +384,7 @@ def create_exercise_report(
     if not exercise:
         return {
             "success": False,
-            "error": f"ExerciseReport could be only created for existing exercise, exercise {exercise_id} does not exists!"
+            "message": f"ExerciseReport could be only created for existing exercise, exercise {exercise_id} does not exists!"
         }
 
     exercise_report = db_session.query(ExerciseReport).filter(
@@ -386,7 +394,8 @@ def create_exercise_report(
     if exercise_report:
         return {
             "success": False,
-            "error": f"ExerciseReport already exists with id {exercise_report.id}!"
+            "message": f"ExerciseReport already exists with id {exercise_report.id}!",
+            "exercise_report_id": exercise_report.id
         }
     valid_count_reason =  [
             'Отсутствие ХП-И', 
@@ -399,7 +408,7 @@ def create_exercise_report(
     if count_reason not in valid_count_reason:
         return {
             "success": False,
-            "error": f" {'Count reason should be one of: '.join(valid_count_reason)}!"
+            "message": f" {'Count reason should be one of: '.join(valid_count_reason)}!"
         }
     exercise_report = ExerciseReport(
         start_date=start_date,
@@ -415,7 +424,9 @@ def create_exercise_report(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Created exercise report with id {exercise_report.id}!"
+        "message": f"Created exercise report with id {exercise_report.id}!",
+        "exercise_report_id": exercise_report.id
+
     }
 
 
@@ -438,7 +449,9 @@ def create_attestation(
     if attestation:
         return {
             "success": False,
-            "message": f"Attestation already exists for employee {employee_id} with id {attestation.id}!"
+            "message": f"Attestation already exists for employee {employee_id} with id {attestation.id}!",
+            "employee_id":employee_id,
+            "attestation_id": attestation.id
         }
 
     attestation_type = db_session.query(AttestationType).filter(
@@ -448,13 +461,15 @@ def create_attestation(
     if attestation:
         return {
             "success": False,
-            "message": f"Attestation already exists with id {attestation_type.id} for employee {employee_id}!"
+            "message": f"Attestation already exists with id {attestation.id} for employee {employee_id}!",
+            "employee_id":employee_id,
+            "attestation_id": attestation.id
         }
 
     if not attestation_type:
         return {
             "success": False,
-            "message": f"Attestation type {type_id} does not exists with!"
+            "message": f"Attestation type {type_id} does not exists!",
         }
 
     attestation = Attestation(
@@ -470,7 +485,8 @@ def create_attestation(
     db_session.commit()
     return {
         "success": True,
-        "message": f"Added attestation {attestation.id} for employee {employee_id} on date {date}!"
+        "message": f"Added attestation {attestation.id} for employee {employee_id} on date {date}!",
+        "attestation_type":attestation.id
     }
 
 def create_attestation_type(
@@ -484,7 +500,8 @@ def create_attestation_type(
     if attestation_type:
         return {
             "success": False,
-            "message": f"Attestation type {name} already exists with id {attestation_type.id}!"
+            "message": f"Attestation type {name} already exists with id {attestation_type.id}!",
+            "attestation_type_id": attestation_type.id
         }
     
     attestation_type = AttestationType(
@@ -495,5 +512,6 @@ def create_attestation_type(
     db_session.flush()
     return {
         "success": True,
-        "message": f"Added attestation type {name} with id {attestation_type.id}!"
+        "message": f"Added attestation type {name} with id {attestation_type.id}!",
+        "attestation_type_id": attestation_type.id
     }
