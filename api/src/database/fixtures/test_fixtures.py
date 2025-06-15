@@ -1,14 +1,14 @@
 from typing import cast, List, Optional
 
-from sqlalchemy import Boolean, Date, DateTime
-from database.db_connector import SessionLocal, get_db
+from sqlalchemy import Date, DateTime
+from database.db_connector import SessionLocal
 from config.admin_user import admin_user_credentials
-from database.db_entity_creation_scripts import create_attestation, create_attestation_type, create_employee, create_exercise_report, create_exercise_type, create_position, create_privilege, create_user, grant_privilege_by_names, create_rang, grant_privilege_by_ids, create_exercise
-from database.fixtures import admin_fixture
+from database.db_entity_creation_scripts import create_attestation, create_attestation_type, create_employee, create_exercise_report, create_exercise_type, create_position, create_user, grant_privilege_by_names, create_rang, create_exercise
 
 
 def grant_admin_all_privs():
     db = SessionLocal() 
+
     from database.fixtures.privilege_fixtures import priv_list
     for priv in priv_list:
         grant_privilege_by_names(
