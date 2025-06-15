@@ -24,7 +24,7 @@ def update_employee(
     if not employee:
         return {
             "success": False,
-            "error": f"Employee with id {employee_id} does not exist"
+            "message": f"Employee with id {employee_id} does not exist!"
         }
     
     # Update fields that were provided
@@ -42,7 +42,7 @@ def update_employee(
         if not position:
             return {
                 "success": False,
-                "error": f"Position with id {position_id} does not exist"
+                "message": f"Position with id {position_id} does not exist!"
             }
         employee.position_id = position_id
     if rang_id is not None:
@@ -51,7 +51,7 @@ def update_employee(
         if not rang:
             return {
                 "success": False,
-                "error": f"Rang with id {rang_id} does not exist"
+                "message": f"Rang with id {rang_id} does not exist!"
             }
         employee.rang_id = rang_id
     if comment is not None:
@@ -76,7 +76,7 @@ def update_position(
     if not position:
         return {
             "success": False,
-            "error": f"Position with id {position_id} does not exist"
+            "message": f"Position with id {position_id} does not exist"
         }
 
     valid_groups = ['среднего и старшего начальствующего состава',
@@ -90,7 +90,7 @@ def update_position(
         if group_position not in valid_groups:
             return {
                 "success": False,
-                "error": f"Invalid group position. Must be one of: {', '.join(valid_groups)}"
+                "message": f"Invalid group position. Must be one of: {', '.join(valid_groups)}"
             }
         position.group_position = group_position
     
@@ -112,7 +112,7 @@ def update_attestation_type(
     if not attestation_type:
         return {
             "success": False,
-            "error": f"AttestationType with id {attestation_type_id} does not exist"
+            "message": f"AttestationType with id {attestation_type_id} does not exist"
         }
     
     if new_name is not None:
@@ -129,7 +129,6 @@ def update_attestation(
     db_session: Session,
     attestation_id: int,
     emplyee_id: int,
-    new_type_id: Optional[int] = None,
     new_status: Optional[int] = None,
     new_date: Optional[Date] = None,
     new_examination_date: Optional[Date] = None
@@ -142,11 +141,9 @@ def update_attestation(
     if not attestation:
         return {
             "success": False,
-            "error": f"Attestation with id {attestation_id} does not exist"
+            "message": f"Attestation with id {attestation_id} does not exist!"
         }
     
-    if new_type_id is not None:
-        attestation.type_id = new_type_id
     if new_status is not None:
         attestation.status = new_status
     if new_date is not None:
@@ -171,7 +168,7 @@ def update_rang(
     if not rang:
         return {
             "success": False,
-            "error": f"Rang with id {rang_id} does not exist"
+            "message": f"Rang with id {rang_id} does not exist"
         }
     
     if name is not None:
@@ -195,7 +192,7 @@ def update_exercise_type(
     if not exercise_type:
         return {
             "success": False,
-            "error": f"ExerciseType with id {type_id} does not exist"
+            "message": f"ExerciseType with id {type_id} does not exist"
         }
     
     if new_name is not None:
@@ -225,7 +222,7 @@ def update_exercise_report(
     if not exercise_report:
         return {
             "success": False,
-            "error": f"ExerciseReport does not exist"
+            "message": f"ExerciseReport does not exist"
         }
 
     valid_count_reason = [
@@ -241,7 +238,7 @@ def update_exercise_report(
         if new_count_reason not in valid_count_reason:
             return {
                 "success": False,
-                "error": f"Invalid count reason. Must be one of: {', '.join(valid_count_reason)}"
+                "message": f"Invalid count reason. Must be one of: {', '.join(valid_count_reason)}"
             }
         exercise_report.count_reason = new_count_reason
 
@@ -279,7 +276,7 @@ def update_exercise(
     if not exercise:
         return {
             "success": False,
-            "error": f"Exercise with id {exercise_id} does not exist"
+            "message": f"Exercise with id {exercise_id} does not exist"
         }
 
     if employee_id is not None:
@@ -287,7 +284,7 @@ def update_exercise(
         if not employee:
             return {
                 "success": False,
-                "error": f"Employee with id {employee_id} does not exist"
+                "message": f"Employee with id {employee_id} does not exist"
             }
         exercise.employee_id = employee_id
 
@@ -298,7 +295,7 @@ def update_exercise(
         if not exercise_type:
             return {
                 "success": False,
-                "error": f"Exercise type with id {exercise_type_id} does not exist"
+                "message": f"Exercise type with id {exercise_type_id} does not exist"
             }
         exercise.exercise_type_id = exercise_type_id
 

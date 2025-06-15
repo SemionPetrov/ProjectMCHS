@@ -21,7 +21,7 @@ def revoke_privilege_by_ids(
             privilege.name == admin_user_credentials.ADMIN_PRIVILEGE_NAME:
         return {
             "success": False,
-            "error": f"Can not delete admin privilege from admin!\n\
+            "message": f"Can not delete admin privilege from admin!\n\
                     If access is lost or credentials are compromised:\n\
                     1. Change adimn user data in local.env.\n\
                     2. Restart the docker api container.\n\
@@ -31,27 +31,31 @@ def revoke_privilege_by_ids(
     if not user:
         return {
             "success": False,
-            "error": f"User with login {user.login} does not exist"
+            "message": f"User with login {user.login} does not exist"
         }
     
     
     if not privilege:
         return {
             "success": False,
-            "error": f"{privilege.name} privilege not found!"
+            "message": f"{privilege.name} privilege not found!"
         }
     
     if privilege not in user.privileges:
         return {
             "success": False,
-            "error": f"User with id {user_id} does not have privilege {privilege_id}"
+            "message": f"User with {user.login} does not have privilege {privilege.name}!",
+            "user_id": user.id,
+            "privilege_id": privilege.id
         }
     
     user.privileges.remove(privilege)
     db_session.commit()
     return {
         "success": True,
-        "data": privilege_id
+        "message": f"Removed {privilege.name} from {user.login}!",
+        "user_id": user.id,
+        "privilege_id": privilege.id
     }
 
 def delete_employee(db: Session, employee_id: int):
@@ -70,8 +74,34 @@ def delete_employee(db: Session, employee_id: int):
         db.rollback()
         return {
             "success": False,
-            "error": f"{e}"
+            "message": f"{e}"
         }
+
+
+def delete_privilege(
+    db_session,
+    privilege_id: int
+):
+    try:
+        stmt = delete(Privilege).where(Privilege.id == privilege_id)
+        db_session.execute(stmt)
+        
+        db_session.commit()
+        
+        return {
+                "success" : True,
+                "message" : f"deleted privilege {privilege_id}",
+                "privilege_id": privilege_id
+                }
+    
+    except Exception as e:
+        db_session.rollback()
+
+        return {
+                "success" : False,
+                "message" : f"{e}"
+                }
+
 
 def delete_position(
     db_session,
@@ -84,15 +114,16 @@ def delete_position(
         db_session.commit()
         
         return {
-                "Success" : True,
-                "message" : f"Deleted position {position_id}"
+                "success" : True,
+                "message" : f"deleted position {position_id}",
+                "position_id": position_id
                 }
     
     except Exception as e:
         db_session.rollback()
 
         return {
-                "Success" : False,
+                "success" : False,
                 "message" : f"{e}"
                 }
 
@@ -223,7 +254,7 @@ def delete_exercise(
         if not exercise:
             return {
                 "success": False,
-                "error": f"Exercise with id {exercise_id} does not exist"
+                "message": f"Exercise with id {exercise_id} does not exist"
             }
             
         stmt = delete(PendingExercise).where(PendingExercise.id == exercise_id)
@@ -240,5 +271,5 @@ def delete_exercise(
         db_session.rollback()
         return {
             "success": False,
-            "error": f"{str(e)}"
+            "message": f"{str(e)}"
         }

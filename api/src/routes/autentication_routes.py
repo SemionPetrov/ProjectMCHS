@@ -10,7 +10,8 @@ from database.db_entity_creation_scripts import create_user
 
 router = APIRouter(
         prefix="/auth",
-        tags=["authentication"])
+        tags=["authentication"]
+        )
 
 
 @router.post("/login",  responses={

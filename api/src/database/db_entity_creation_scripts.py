@@ -66,6 +66,7 @@ def grant_privilege_by_ids(
         return {
             "success": False,
             "message": f"Privilege {privilege.name} already exists for user {user.login}",
+            "user_id": user.id,
             "priv_id": privilege.id
         }
     

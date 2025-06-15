@@ -1,14 +1,25 @@
 from fastapi import FastAPI, APIRouter
+from sqlalchemy import desc
 from database.db_connector import Base, engine
 from routes import admin_routes, user_routes, autentication_routes, attestation_management_routes, exercise_management_routes, personnnel_management_routes
 
-app = FastAPI()
+description = """
+Project MCHS API
+"""
+
+
+app = FastAPI(
+        title="Project MCHS API",
+        description=description,
+        version="4.18",
+        contact={"repo":"https://github.com/SemionPetrov/ProjectMCHS/tree/main"},
+        )
 
 # init db
 Base.metadata.create_all(bind=engine)
 
 api_router = APIRouter(
-        prefix="/api"
+        prefix="/api",
 )
 
 # add routes

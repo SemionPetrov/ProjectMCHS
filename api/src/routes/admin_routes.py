@@ -1,6 +1,6 @@
 from datetime import date
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import ReturnsRows, select
 from sqlalchemy.orm import Session
 
 from authentication.auth import  PermissionChecker
@@ -22,7 +22,12 @@ def admin_dashboard(
                 ["backend info:read"])),
             db: Session = Depends(get_db)
     ):
+    """
+    Получить базовую информацию о работе api
 
+    Returns:
+        dict: Api runtime info
+    """
     from datetime import datetime
     from config.db_timezone import prefered_timezone
     from database.db_models import User
@@ -37,27 +42,38 @@ def admin_dashboard(
         }
 
 
-@router.get("/users")
+@router.get("/users/all")
 def admin_list_users(
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(
                 ["privilege:read"])),
         db: Session = Depends(get_db)
     ):
+    """
+    Получить список пользователей
+
+    Returns:
+        List: All users
+    """
     users_query = db.query(User)
     users = users_query.all()
     return users
 
 
 
-@router.get("/list_privileges")
+@router.get("/privileges/all", tags=["privilege"])
 def admin_list_privileges(
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(
                 ["privilege:read"])),
         db: Session = Depends(get_db)
     ):
+    """
+    Получить список привилегий
 
+    Returns:
+        Dict: user_id, login, privilege_id, privilege_name
+    """
     from database.db_models import User, Privilege, user_privileges
     stmt = select(User.id.label('user_id'),
                  User.login.label('login'),
@@ -70,7 +86,6 @@ def admin_list_privileges(
     
     result = db.execute(stmt)
     rows = result.all()
-
     print(rows) 
 
     privileges_list = []
@@ -84,7 +99,7 @@ def admin_list_privileges(
     return privileges_list
 
 
-@router.get("/list_privileges/{user_id}")
+@router.get("/privileges/{user_id}", tags=["privilege"])
 def admin_user_list_privileges(
         user_id: str,
         permission_checker: PermissionChecker = 
@@ -92,7 +107,12 @@ def admin_user_list_privileges(
             [admin_user_credentials.ADMIN_PRIVILEGE_NAME])),
         db: Session = Depends(get_db)
     ):
+    """
+    Получить списко привилегий пользоватетя по id 
 
+    Returns:
+        Dict: user_id, login, privilege_id, privilege_name
+    """
     from database.db_models import User, Privilege, user_privileges
     stmt = select(User.id.label('user_id'),
                  User.login.label('login'),
@@ -118,14 +138,19 @@ def admin_user_list_privileges(
     return privileges_list
 
 
-@router.get("/privileges/all")
+@router.get("/privileges/all", tags=["privilege"])
 def get_all_privileges(
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(
             ["privilege:read"])),
     ):
+    """
+    Получить список доступных привилегий
 
+    Returns:
+        dict: id, name 
+    """
     from database.db_models import Privilege
     result = db.execute(
         select(Privilege.id, Privilege.name)
@@ -141,8 +166,8 @@ def get_all_privileges(
     return privileges_list
 
 
-@router.delete("/privileges/{user_id}/{privilege_id}")
-def admin_delete_privilege(
+@router.delete("/privilege/{user_id}/{privilege_id}", tags=["privilege"])
+def admin_revoke_privilege(
         user_id: int,
         privilege_id: int,
         permission_checker: PermissionChecker = 
@@ -150,22 +175,39 @@ def admin_delete_privilege(
             ["privilege:read","privilege:read"])),
         db: Session = Depends(get_db)
     ):
+    """
+    Удалить привилегию у пользоватетя
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     from database.db_entity_deletion_scripts import revoke_privilege_by_ids
     result = revoke_privilege_by_ids(db, user_id, privilege_id)
     
-    # Handle the response based on success/error
-    if not result["success"]:
-        return {
-            "success": False,
-            "error": result["error"]
-        }
-    
-    return {
-        "success": True,
-        "message": f"Successfully revoked privilege {privilege_id} from user {user_id}"
-    }
+    return result
 
-@router.post("/privileges/create/{privilege_name}")
+@router.delete("/privilege/{privilege_id}", tags=["privilege"])
+def admin_delete_privilege(
+        privilege_id: int,
+        permission_checker: PermissionChecker = 
+        Depends(PermissionChecker(
+            ["privilege:read","privilege:read"])),
+        db: Session = Depends(get_db)
+    ):
+    """
+    Удалить привилегию.
+    Удаление не произойдет если привилегия есть хотя бы у одного пользоватетя
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
+    from database.db_entity_deletion_scripts import delete_privilege 
+    result = delete_privilege(db, privilege_id)
+    
+    return result
+
+
+@router.post("/privileges/create/{privilege_name}", tags=["privilege"])
 def create_privilege(
     privilege_name: str,
     db: Session = Depends(get_db),
@@ -173,23 +215,19 @@ def create_privilege(
         Depends(PermissionChecker(
             ["privilege:read","privilege:read"])),
 ):
+    """
+    Создать привилегию
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     from database.db_entity_creation_scripts import create_privilege
     result = create_privilege(db, privilege_name)
     
-    # Handle the response based on success/error
-    if not result["success"]:
-        return {
-            "success": False,
-            "error": result["error"]
-        }
-    
-    return {
-        "success": True,
-        "message": f"Successfully created privilege {privilege_name}"
-    }
+    return result
 
 
-@router.post("/privileges/{user_id}/{privilege_id}")
+@router.post("/privileges/{user_id}/{privilege_id}", tags=["privilege"])
 def admin_grant_privilege(
         user_id: int,
         privilege_id: int,
@@ -198,6 +236,12 @@ def admin_grant_privilege(
             ["privilege:read","privilege:read"])),
         db: Session = Depends(get_db)
     ):
+    """
+    Выдать привилегию пользователю по ID обоих сущностей
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     from database.db_entity_creation_scripts import grant_privilege_by_ids
 
     result = grant_privilege_by_ids(db, user_id, privilege_id)
@@ -205,14 +249,19 @@ def admin_grant_privilege(
     return result
 
 
-@router.post("/db_run_query", tags=["dangerous"])
+@router.post("/db_run_query")
 def execute_query(
         query:str, 
         permission_checker: PermissionChecker = 
             Depends(PermissionChecker(
                 ["db query"]))
     ):
+    """
+    Выполнить SQL запрос в бд
 
+    Returns:
+        Dict: status, query, result
+    """
     from sqlalchemy import text
     from database.db_connector import engine 
 

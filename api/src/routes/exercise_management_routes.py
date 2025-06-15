@@ -15,7 +15,6 @@ from authentication.auth import PermissionChecker
 
 router = APIRouter(
         prefix="/exercise",
-        tags=["exercise management"]
     )
 
 @router.post("/type/add", tags=["exercise type"])
@@ -25,6 +24,12 @@ def add_exercise_type(
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
         ):
+    """
+    Добавить тип занятий
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     result = create_exercise_type(db, exercise_type_name)
     return result
 
@@ -36,6 +41,12 @@ def get_all_exercise_types(
         db: Session = Depends(get_db)
     ):
 
+    """
+    Получить все доступные типы занятий
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     stmt = select(ExerciseType).\
         order_by(ExerciseType.id, ExerciseType.name)
     
@@ -51,6 +62,13 @@ def delete_exercise_type_route(
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
     ):
+
+    """
+    Удалить тип занятий
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     result = delete_exercise_type(db,type_id)
     return result    
 
@@ -63,6 +81,13 @@ def update_exercise_type_route(
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
     ):
+
+    """
+    Обновить тип занятий
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     result = update_exercise_type(db, type_id, new_name)
     return result
 
@@ -80,6 +105,13 @@ def add_exercise_report_route(
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
     ):
+
+    """
+    Добавить отчет о занятии
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     result = create_exercise_report(
                 db,
                 exercise_id,
@@ -100,6 +132,12 @@ def get_exercise_reports(
         db: Session = Depends(get_db)
     ):
 
+    """
+    Получить ве отчеты о занятиях
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     stmt = select(ExerciseReport).\
         order_by(
                 ExerciseReport.start_date,
@@ -122,6 +160,12 @@ def delete_exercise_report_route(
         db: Session = Depends(get_db)
     ):
 
+    """
+    Удалить отчет о занятии
+
+    Returns:
+        Dict: result, message, <entity_id>
+    """
     result = delete_exercise_report(db,report_id)
     return result    
 
@@ -139,6 +183,13 @@ def update_exercise_report_route(
             Depends(PermissionChecker(["exercise:read", "exercise:write"])),
         db: Session = Depends(get_db)
     ):
+
+    """
+    Обновить отчет о занятии
+
+    Returns:
+        Dict: result
+    """
 
     result = update_exercise_report(
             db,
@@ -163,6 +214,13 @@ def add_exercise(
         Depends(PermissionChecker(["exercise:read", "exercise:write"])),
     db: Session = Depends(get_db)
 ):
+
+    """
+    Добавить занятие
+
+    Returns:
+        Dict: result
+    """
     result = create_exercise(
         db,
         employee_id,
@@ -186,6 +244,13 @@ def update_exercise_route(
         Depends(PermissionChecker(["exercise:read", "exercise:write"])),
     db: Session = Depends(get_db)
 ):
+
+    """
+    Обновить занятие
+
+    Returns:
+        Dict: result
+    """
     result = update_exercise(
         db,
         exercise_id,
@@ -205,6 +270,13 @@ def delete_exercise_route(
         Depends(PermissionChecker(["exercise:read", "exercise:write"])),
     db: Session = Depends(get_db)
 ):
+
+    """
+    Удалить занятие
+
+    Returns:
+        Dict: result
+    """
     result = delete_exercise(db, exercise_id)
     return result
 
@@ -216,6 +288,12 @@ def get_exercises(
         db: Session = Depends(get_db)
     ):
 
+    """
+    Получить все занятия
+
+    Returns:
+        Dict: result
+    """
     stmt = select(PendingExercise).\
         order_by(
                 PendingExercise.id,

@@ -8,7 +8,7 @@ from authentication.auth import get_user_from_token, oauth2_scheme, PermissionCh
 from database.db_connector import get_db
 from database.db_entity_selection_scripts import get_user_privs_with_ids
 from database.db_entity_updation_scripts import update_employee 
-from database.db_models import PendingExercise
+from database.db_models import PendingExercise, Attestation
 
 router = APIRouter(
         prefix="/user",
@@ -18,10 +18,28 @@ router = APIRouter(
 
 @router.get("/attestations")
 def get_user_attestations(
-        permission_checker: PermissionChecker = 
-        Depends(PermissionChecker([None]))
+        token: str = Depends(oauth2_scheme), 
+        db: Session = Depends(get_db)
     ):
-    return {"Not implimented"}
+    user = get_user_from_token(token, db)
+
+    if user.employee_id is None:
+        return {
+                "success": False,
+                "message": "User has no employee_id!"
+                }
+
+    stmt = select(Attestation.employee_id).\
+        where(Attestation.employee_id== user.employee_id).\
+        order_by(
+                Attestation.id,
+                Attestation.employee_id,
+        )
+    
+    result = db.execute(stmt)
+    attestations= result.scalars().all()
+    
+    return attestations 
 
 
 @router.put("/change_personal_data")
@@ -38,13 +56,20 @@ def change_personal_data(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme)
     ):
-    
+    """
+    Изменить данные сотрудника.
+    Пользователь должен иметь employee_id чтобы поменять свои данные
+
+    Returns:
+        Dict: Result
+    """
     user = get_user_from_token(token, db)
     if user.employee_id is None:
         return {
                 "success": False,
                 "message": "User has no employee_id!"
                 }
+
     result = update_employee(
             db,
             user.employee_id,
@@ -61,14 +86,20 @@ def change_personal_data(
 
 
 @router.get("/exercises")
-def pending_exercises(
+def get_exercises(
         token: str = Depends(oauth2_scheme), 
-        permission_checker: PermissionChecker = 
-            Depends(PermissionChecker([None])),
         db: Session = Depends(get_db)
     ):
-    user = get_user_from_token(token, db)
 
+
+    """
+    Получить список занятий сотрудника к которому привязан пользователь
+
+    Returns:
+        List: exercises
+    """
+    user = get_user_from_token(token, db)
+    print(user.id)
     if user.employee_id is None:
         return {
                 "success": False,
@@ -93,6 +124,13 @@ def get_user_privileges(
         token: str = Depends(oauth2_scheme), 
         db: Session = Depends(get_db)
         ):
+
+    """
+    Получить список привилегий пользователя
+
+    Returns:
+        List: privileges
+    """
     user = get_user_from_token(token, db)
     
     privileges = [i["privilege_name"] for i in get_user_privs_with_ids(user, db)]

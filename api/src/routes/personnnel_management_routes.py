@@ -16,7 +16,6 @@ from database.db_models import Employee, Position, Rang
 
 router = APIRouter(
         prefix="/personnel",
-        tags=["personnel"]
     )
 
 
@@ -70,7 +69,12 @@ def add_employee(
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
         db: Session = Depends(get_db)
     ):
+    """
+    Добавить сотрудника
 
+    Returns: 
+        Dict: result
+    """
     result = create_employee(
         db_session=db,
         last_name=last_name,
@@ -91,6 +95,12 @@ def get_personnel_list(
         db: Session = Depends(get_db)
     ):
      
+    """
+    Получить списко всех сотрудников
+
+    Returns: 
+        Dict: result
+    """
     stmt = select(Employee).\
         order_by(
                 Employee.id, 
@@ -116,7 +126,14 @@ def delete_employee_route(
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
-):
+    ):
+
+    """
+   Удалить сотрудника
+
+    Returns: 
+        Dict: result
+    """
     result = delete_employee(db, employee_id)
     
     return result
@@ -131,6 +148,13 @@ def update_employee_route(
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
 ):
+
+    """
+   Обновить данные сотрудника
+
+    Returns: 
+        Dict: result
+    """
     result = update_employee(
         db_session=db,
         employee_id=employee_id,
@@ -147,7 +171,13 @@ def add_position(
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
         db: Session = Depends(get_db)
     ):
+    
+    """
+    Добавить позицию 
 
+    Returns: 
+        Dict: result
+    """
     result = create_position(
         db_session=db,
         name=name,
@@ -165,6 +195,13 @@ def update_position_route(
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
 ):
+
+    """
+    Обновить позицию 
+
+    Returns: 
+        Dict: result
+    """
     result = update_position(db_session=db, position_id=position_id, name = new_name, group_position=group_position)
 
     return result    
@@ -177,6 +214,13 @@ def delete_position_route(
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
 ):
+
+    """
+    Удалить позицию 
+
+    Returns: 
+        Dict: result
+    """
     result = delete_position(db_session=db, position_id=position_id)
     return result    
 
@@ -186,7 +230,14 @@ def get_positions_list(
     db: Session = Depends(get_db),
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:read"])),
-        ):
+    ):
+
+    """
+    Поулчить все доступные позиции
+
+    Returns: 
+        Dict: result
+    """
     stmt = select(Position).\
         order_by(Position.id, Position.name, Position.group_position)
     
@@ -204,6 +255,13 @@ def create_rang_route(
         db: Session = Depends(get_db)
     ):
 
+    """
+    Создать ранг 
+
+    Returns: 
+        Dict: result
+    """
+
     result = create_rang(
         db_session=db,
         name=name,
@@ -217,6 +275,13 @@ def get_rangs_list(
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:read"])),
         ):
+
+    """
+    Получить список все рангов 
+
+    Returns: 
+        Dict: result
+    """
     stmt = select(Rang).\
         order_by(Rang.id, Rang.name)
     
@@ -234,6 +299,13 @@ def update_rang_route(
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
 ):
+
+    """
+    Обновить ранг
+
+    Returns: 
+        Dict: result
+    """
     result = update_rang(db_session=db, rang_id=rang_id, name = new_name)
     
     return result
@@ -245,6 +317,13 @@ def delete_rang_route(
     permission_checker: PermissionChecker = 
         Depends(PermissionChecker(["personnel:write", "personnel:read"])),
 ):
+
+    """
+    Удалить ранг
+
+    Returns: 
+        Dict: result
+    """
     result = delete_rang(db_session=db, rang_id=rang_id)
     
     return result
