@@ -1,7 +1,10 @@
-from sqlalchemy.orm import Session
+from fastapi.openapi.models import OpenAPI
+from sqlalchemy.orm import Session, session
+import bcrypt
 from database.db_models import *
 from typing import Optional
 from datetime import datetime
+from authentication.auth import create_access_token
 
 """
 Collection of scripts to uupdate entities in database.
@@ -311,3 +314,47 @@ def update_exercise(
         "success": True,
         "message": f"Successfully updated exercise {exercise_id}",
     }
+
+def update_user(
+    db:Session,
+    user_id: int,
+    new_login: Optional[str] = None,
+    new_password: Optional[str] = None
+    ):
+
+    user = db.query(User).filter(
+        User.id == user_id 
+    ).first()
+
+    if user is None:
+        return {
+            "success": False,
+            "message": "User does not exists!",
+            "user_id": user_id
+        }
+    if new_login is not None:
+        user.login= new_login
+    
+    if new_password is not None:
+        password_hash = bcrypt.hashpw(
+            new_password.encode(),
+            bcrypt.gensalt()
+        ).decode()
+        user.password_hash = password_hash
+    
+    db.commit()
+    new_token = create_access_token(user, db)
+
+    return {
+        "success": True,
+        "message": f"Updated user {user.id}!",
+        "user_id": user.id,
+        "user_login":user.login,
+        "access_token": new_token, 
+        "token_type": "bearer"
+    }
+    
+
+
+        
+

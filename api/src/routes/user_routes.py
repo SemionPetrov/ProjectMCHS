@@ -8,7 +8,7 @@ from typing import Optional, cast
 from authentication.auth import get_user_from_token, oauth2_scheme, PermissionChecker
 from database.db_connector import get_db
 from database.db_entity_selection_scripts import get_user_privs_with_ids
-from database.db_entity_updation_scripts import update_employee 
+from database.db_entity_updation_scripts import update_employee, update_user 
 from database.db_models import PendingExercise, ExerciseType, Attestation, AttestationType , User, Employee, Position, Rang
 
 router = APIRouter(
@@ -238,3 +238,27 @@ def get_user_privileges(
     privileges = [i["privilege_name"] for i in get_user_privs_with_ids(user, db)]
 
     return UserPrivilegesResponse(privileges=privileges) 
+
+@router.put("change_user_data")
+def changes_user_data_route(
+        token: str = Depends(oauth2_scheme), 
+        db: Session = Depends(get_db),
+        new_login: Optional[str] = None,
+        new_password: Optional[str] = None
+    ):
+    """
+    Обновить логин/пароль пользователя
+
+    Returns:
+        Dict: Result
+    """
+    user = get_user_from_token(token, db)
+
+    result = update_user(
+        db,
+        user.id,
+        new_login,
+        new_password
+        )
+    return result
+
