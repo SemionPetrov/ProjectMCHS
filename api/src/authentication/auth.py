@@ -72,8 +72,9 @@ class PermissionChecker:
             missing_permissions = [
                 perm for perm in self.required_permissions 
                 if perm not in user_permissions
-            ] if self.required_permissions != None else None
-            
+            ] if self.required_permissions != [None] else [] 
+            print(missing_permissions) 
+
             if missing_permissions:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,

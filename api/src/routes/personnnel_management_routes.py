@@ -101,23 +101,40 @@ def get_personnel_list(
     Returns: 
         Dict: result
     """
-    stmt = select(Employee).\
-        order_by(
-                Employee.id, 
-                 Employee.last_name, 
-                 Employee.first_name,
-                 Employee.surname,
-                 Employee.birthday,
-                 Employee.position_id,
-                 Employee.rang_id,
-                 Employee.comment
-        )
+    query = select(Employee, Position, Rang).select_from(Employee).outerjoin(
+        Position, Position.id == Employee.position_id
+    ).outerjoin(
+        Rang, Rang.id == Employee.rang_id
+    ).order_by(
+        Employee.last_name,
+        Employee.first_name,
+        Employee.id
+    )
     
-    result = db.execute(stmt)
-    employees = result.scalars().all()
-    print(employees)
+    result = db.execute(query)
+    employees_data = result.all()
     
-    return employees 
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": emp.id,
+                "last_name": emp.last_name,
+                "first_name": emp.first_name,
+                "surname": emp.surname,
+                "birthday": emp.birthday,
+                "comment": emp.comment,
+                "position": {
+                    "name": pos.name,
+                    "group_position": pos.group_position
+                } if pos else None,
+                "rang": {
+                    "name": rang.name
+                } if rang else None
+            }
+            for emp, pos, rang in employees_data
+        ]
+    }
 
 
 @router.delete("/{employee_id}", tags=["employee"])

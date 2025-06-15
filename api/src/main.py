@@ -42,3 +42,7 @@ setup_privileges()
 from database.fixtures.admin_fixture import setup_admin_fixture
 setup_admin_fixture()
 
+# add test fixtures
+from database.fixtures.test_fixtures import  setup_test_fixture
+setup_test_fixture()
+

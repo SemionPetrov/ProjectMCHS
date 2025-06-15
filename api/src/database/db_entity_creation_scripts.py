@@ -71,6 +71,7 @@ def grant_privilege_by_ids(
         }
     
     user.privileges.append(privilege)
+    db_session.flush()
     db_session.commit()
     return {
         "success": True,
@@ -139,7 +140,8 @@ def create_user(
         # exposing id seems like a bad idea
         return {
             "success": False,
-            "message": "User already exists!"
+            "message": "User already exists!",
+            "user_id": user.id
         }
     
     # Hash password
@@ -165,7 +167,8 @@ def create_user(
     return {
         "success": True,
         "message": f"Created user {user.login}!",
-        "user_id": user.id
+        "user_id": user.id,
+        "user_login":user_login
     }
 
 
@@ -378,7 +381,7 @@ def create_exercise_report(
 ):
 
     exercise = db_session.query(PendingExercise).filter(
-        PendingExercise.id== exercise_id,
+        PendingExercise.id == exercise_id,
     ).first()
 
 
@@ -389,7 +392,7 @@ def create_exercise_report(
         }
 
     exercise_report = db_session.query(ExerciseReport).filter(
-        ExerciseReport.exercise_id== exercise_id,
+        ExerciseReport.exercise_id == exercise_id,
     ).first()
     
     if exercise_report:
@@ -413,6 +416,7 @@ def create_exercise_report(
         }
     exercise_report = ExerciseReport(
         start_date=start_date,
+        exercise_id=exercise_id,
         finish_date=finish_date,
         count_plan=count_plan,
         count_actual=count_actual,
@@ -515,4 +519,37 @@ def create_attestation_type(
         "success": True,
         "message": f"Added attestation type {name} with id {attestation_type.id}!",
         "attestation_type_id": attestation_type.id
+    }
+
+def link_user_to_employee(
+        db_session: Session,
+        user_id: int,
+        employee_id: int,
+    ):
+    user= db_session.query(User).filter(
+        User.id== user_id
+        )
+    
+    employee = db_session.query(Employee).filter(
+            Employee.id == employee_id
+        )
+    if not user:
+        return {
+            "success": True,
+            "message": f"User does not exists"
+            }
+
+    if not employee_id:
+        return {
+            "success": True,
+            "message": f"Employee does not exists!"
+            }
+
+    user.employee_id = employee_id
+    
+    return {
+        "success": True,
+        "message": f"Linked user {user.login} to employee {employee_id}!",
+        "user_id": user_id,
+        "employee_id":employee_id
     }
