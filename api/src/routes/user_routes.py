@@ -121,7 +121,7 @@ def get_user_attestations(
             {
                 "id": att.id,
                 "employee_id": att.employee_id,
-                "type_name": att.type.name,  # Using type name instead of id
+                "type_name": att.type.name,  
                 "status": att.status,
                 "no_attestation_reason": att.no_attestation_reason,
                 "date": att.date,

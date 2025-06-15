@@ -1,55 +1,33 @@
 from database.db_connector import  SessionLocal
-from config.admin_user import admin_user_credentials
-from database.db_entity_creation_scripts import create_privilege, create_user, grant_privilege_by_names
-from database.db_models import Attestation
+from database.db_entity_creation_scripts import create_privilege
 
+
+priv_list = [
+            "personnel:read",
+            "personnel:write",
+
+            "exercise:read",
+            "exercise:write",
+
+            "attestation:read",
+            "attestation:write",
+
+            "privilege:read",
+            "privilege:write",
+
+            "backend info:read",
+            "db query"
+        ]
 
 def setup_privileges():
     """Function to set up privileges."""
     db = SessionLocal()
     try:
-        create_privilege(
-                db,
-                "personnel:read"
-        )
-        create_privilege(
-                db,
-                "exercise:read"
-        )
-        create_privilege(
-                db,
-                "attestation:read"
-        )
-        create_privilege(
-                db,
-                "backend info:read"
-        )
-        create_privilege(
-                db,
-                "privilege:read"
-        )
-
-        create_privilege(
-                db,
-                "personnel:write"
-        )
-        create_privilege(
-                db,
-                "exercise:write"
-        )
-        create_privilege(
-                db,
-                "attestation:write"
-        )
-
-        create_privilege(
-                db,
-                "db query"
-        )
-        create_privilege(
-                db,
-                "privilege:write"
-        )
+        for priv in priv_list:
+            create_privilege(
+                    db,
+                    priv
+            )
     except Exception as e:
         db.rollback()
         raise e

@@ -43,6 +43,9 @@ from database.fixtures.admin_fixture import setup_admin_fixture
 setup_admin_fixture()
 
 # add test fixtures
-from database.fixtures.test_fixtures import  setup_test_fixture
+from database.fixtures.test_fixtures import  setup_test_fixture, grant_admin_all_privs
 setup_test_fixture()
+
+# bad idea for prod
+grant_admin_all_privs()
 
