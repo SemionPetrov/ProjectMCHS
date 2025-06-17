@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Редактирование профиля</title>
+  <link rel="stylesheet" href="/MCHS/styles/logoutButton.css" />
+  <link rel="stylesheet" href="/MCHS/styles/accounts-style.css" />
+  <script defer src="/MCHS/scripts/user/editProfile.js"></script>
+
+  <style>
+    form {
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      padding: 6px;
+      font-size: 14px;
+    }
+    #message {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+
+</head>
+<body>
+<button id="logoutButton">⬅️ Назад</button>
+<h1>Редактирование собственных данных</h1>
+
+<form id="profileForm">
+  <label>Фамилия: <input type="text" id="last_name" /></label>
+  <label>Имя: <input type="text" id="first_name" /></label>
+  <label>Отчество: <input type="text" id="surname" /></label>
+  <label>Дата рождения: <input type="date" id="birthday" /></label>
+  <label>Звание (ID): <input type="number" id="rang_id" /></label>
+  <label>Должность (ID): <input type="number" id="position_id" /></label>
+  <label>Комментарий: <textarea id="comment"></textarea></label>
+
+  <button type="submit">Сохранить изменения</button>
+</form>
+
+<div id="message"></div>
+</body>
+</html>

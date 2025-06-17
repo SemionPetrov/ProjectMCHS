@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Запланированные занятия</title>
+    <link rel="stylesheet" href="/MCHS/styles/accounts-style.css" />
+    <link rel="stylesheet" href="/MCHS/styles/logoutButton.css" />
+    <script defer src="/MCHS/scripts/user/scheduled-events.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .exercise-item {
+            background-color: #fff;
+            padding: 15px 20px;
+            margin: 15px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 700px;
+        }
+
+        .exercise-item h3 {
+            margin-top: 0;
+        }
+
+        #logoutButton {
+            background-color: grey;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #logoutButton:hover {
+            background-color: black;
+        }
+
+        #message {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <button id="logoutButton">⬅️ Назад</button>
+    <h1>Запланированные занятия</h1>
+</header>
+
+<main>
+    <div id="message"></div>
+    <div id="pending-exercises-container"></div>
+</main>
+
+</body>
+</html>

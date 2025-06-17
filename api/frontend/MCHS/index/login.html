@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Система МЧС – Вход</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/MCHS/styles/login.css" />
+  <script defer src="/MCHS/scripts/app.js"></script>
+</head>
+<body>
+
+<div class="background-image"></div>
+
+<div class="login-container">
+  <h2>Вход в систему МЧС</h2>
+  <form id="loginForm">
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="username" placeholder="Логин" required />
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="password" placeholder="Пароль" required />
+    </div>
+
+    <div class="role-select">
+      <label><input type="radio" name="role" value="user" required /> Пользователь</label>
+      <label><input type="radio" name="role" value="admin" required /> Администратор</label>
+    </div>
+
+    <button type="submit">Войти</button>
+  </form>
+
+  <div class="register-link" onclick="window.location.href='/MCHS/index/register.html'">
+    Нет аккаунта? <strong>Зарегистрироваться</strong>
+  </div>
+</div>
+
+</body>
+</html>

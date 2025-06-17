@@ -136,7 +136,7 @@ def get_exercise_reports(
     Получить ве отчеты о занятиях
 
     Returns:
-        Dict: result, message, <entity_id>
+        List: exercise_report list
     """
     stmt = select(ExerciseReport).\
         order_by(

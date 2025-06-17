@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Управление привилегиями</title>
+    <link rel="stylesheet" href="/MCHS/styles/logoutButton.css" />
+    <script defer src="/MCHS/scripts/admin/admin-privileges.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #privilegesTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        #privilegesTable th, #privilegesTable td {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        #privilegesTable th {
+            background-color: #f5f5f5;
+        }
+
+        #privilegesTable tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        #privilegesTable tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .privilege-item {
+            display: inline-block;
+            background-color: #e0e0e0;
+            color: #333;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin: 3px;
+            font-size: 0.85em;
+        }
+
+        .privilege-item button {
+            margin-left: 8px;
+            color: #c00;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #createPrivilegeSection {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        #createPrivilegeSection h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #newPrivilegeName {
+            padding: 10px;
+            width: 60%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #createPrivilegeBtn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            background-color: grey;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #createPrivilegeBtn:hover {
+            background-color: black;
+        }
+
+        #logoutButton {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: grey;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #logoutButton:hover {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+
+<button id="logoutButton">⬅️ Выйти</button>
+
+<h1>Управление привилегиями</h1>
+
+<div class="container">
+    <table id="privilegesTable">
+        <thead>
+        <tr>
+            <th>Пользователь</th>
+            <th>Привилегии</th>
+            <th>Добавить привилегию</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- JS подгрузит данные -->
+        </tbody>
+    </table>
+
+    <div id="createPrivilegeSection">
+        <h2>Создать новую привилегию</h2>
+        <input type="text" id="newPrivilegeName" placeholder="Название привилегии" />
+        <button id="createPrivilegeBtn">Создать</button>
+    </div>
+</div>
+
+</body>
+</html>

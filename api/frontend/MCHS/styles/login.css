@@ -1,0 +1,106 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: url('/other/man.png') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Контейнер логина */
+.login-container {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transform: translateY(-100px);
+  opacity: 0;
+  animation: slideDownFade 1s ease-out 0.5s forwards;
+  position: relative;
+  z-index: 1;
+}
+
+/* Анимация входа формы */
+@keyframes slideDownFade {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.role-select {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+button {
+  background-color: grey;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: black;
+}
+
+.register-link {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: grey;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.register-link:hover {
+  color: black;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.input-group i {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 16px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 12px 12px 40px; /* отступ слева для иконки */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+
